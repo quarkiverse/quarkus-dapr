@@ -1,0 +1,11 @@
+name: Dapr
+description: Dapr SDK
+metadata:
+  keywords:
+    - dapr
+    - multi-runtime
+    - sidecar
+  #  guide: ...
+  categories:
+    - "sidecar"
+  status: "preview"

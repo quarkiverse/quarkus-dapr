@@ -1,0 +1,5 @@
+name: quarkus-dapr
+title: Quarkus - Dapr
+version: dev
+nav:
+  - modules/ROOT/nav.adoc
