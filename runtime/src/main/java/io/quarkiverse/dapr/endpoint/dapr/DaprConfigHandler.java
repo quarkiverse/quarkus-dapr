@@ -1,9 +1,9 @@
 package io.quarkiverse.dapr.endpoint.dapr;
 
+import java.io.IOException;
+
 import io.dapr.actors.runtime.ActorRuntime;
 import io.vertx.ext.web.RoutingContext;
-
-import java.io.IOException;
 
 /**
  * DaprConfigHandler

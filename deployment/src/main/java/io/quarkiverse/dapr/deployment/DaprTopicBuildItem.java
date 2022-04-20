@@ -1,8 +1,8 @@
 package io.quarkiverse.dapr.deployment;
 
-import io.quarkus.builder.item.MultiBuildItem;
-
 import java.util.Map;
+
+import io.quarkus.builder.item.MultiBuildItem;
 
 /**
  * DaprTopicBuildItem

@@ -1,6 +1,11 @@
 package io.quarkiverse.dapr.runtime;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+import javax.inject.Singleton;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.dapr.client.DaprClient;
 import io.dapr.client.DaprClientBuilder;
 import io.quarkiverse.dapr.core.SyncDaprClient;
@@ -8,10 +13,6 @@ import io.quarkiverse.dapr.serializer.JacksonDaprObjectSerializer;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.runtime.Startup;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import javax.inject.Singleton;
 
 /**
  * DaprProducer

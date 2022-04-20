@@ -18,10 +18,10 @@ public class ActorInvokeReminderHandler extends AbstractDaprActorHandler {
     /**
      * Handles API to trigger an actor's reminder.
      *
-     * @param type     Actor type.
-     * @param id       Actor Id.
+     * @param type Actor type.
+     * @param id Actor Id.
      * @param reminder Actor reminder's name.
-     * @param body     Raw request's body.
+     * @param body Raw request's body.
      * @return Void.
      */
     @Override

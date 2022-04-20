@@ -16,12 +16,12 @@
  */
 package io.quarkiverse.dapr.it;
 
-import io.dapr.Topic;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+
+import io.dapr.Topic;
 
 @Path("/dapr")
 @ApplicationScoped
