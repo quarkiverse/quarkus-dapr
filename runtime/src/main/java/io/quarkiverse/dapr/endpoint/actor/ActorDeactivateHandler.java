@@ -19,7 +19,7 @@ public class ActorDeactivateHandler extends AbstractDaprActorHandler {
      * Handles API to deactivate an actor.
      *
      * @param type Actor type.
-     * @param id   Actor Id.
+     * @param id Actor Id.
      * @return Void.
      */
     @Override

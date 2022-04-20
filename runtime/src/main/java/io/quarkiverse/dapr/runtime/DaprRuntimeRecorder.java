@@ -1,9 +1,9 @@
 package io.quarkiverse.dapr.runtime;
 
+import java.util.Map;
+
 import io.quarkiverse.dapr.core.DaprRuntime;
 import io.quarkus.runtime.annotations.Recorder;
-
-import java.util.Map;
 
 /**
  * DaprRuntimeRecorder

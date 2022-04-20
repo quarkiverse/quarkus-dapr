@@ -18,10 +18,10 @@ public class ActorInvokeMethodHandler extends AbstractDaprActorHandler {
     /**
      * Handles API to invoke an actor's method.
      *
-     * @param type   Actor type.
-     * @param id     Actor Id.
+     * @param type Actor type.
+     * @param id Actor Id.
      * @param method Actor method.
-     * @param body   Raw request body.
+     * @param body Raw request body.
      * @return Raw response body.
      */
     @Override

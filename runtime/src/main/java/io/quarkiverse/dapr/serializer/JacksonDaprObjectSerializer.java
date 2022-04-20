@@ -1,11 +1,12 @@
 package io.quarkiverse.dapr.serializer;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.MessageLite;
+
 import io.dapr.serializer.DaprObjectSerializer;
 import io.dapr.utils.TypeRef;
-
-import java.io.IOException;
 
 /**
  * JacksonDaprObjectSerializer

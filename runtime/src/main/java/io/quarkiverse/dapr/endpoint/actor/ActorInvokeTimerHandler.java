@@ -18,10 +18,10 @@ public class ActorInvokeTimerHandler extends AbstractDaprActorHandler {
     /**
      * Handles API to trigger an actor's timer.
      *
-     * @param type  Actor type.
-     * @param id    Actor Id.
+     * @param type Actor type.
+     * @param id Actor Id.
      * @param timer Actor timer's name.
-     * @param body  Raw request's body.
+     * @param body Raw request's body.
      * @return Void.
      */
     @Override

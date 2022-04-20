@@ -1,7 +1,15 @@
 package io.quarkiverse.dapr.deployment;
 
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jboss.jandex.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.dapr.Topic;
 import io.dapr.actors.runtime.ActorRuntimeConfig;
 import io.quarkiverse.dapr.core.DaprTopicSubscription;
@@ -25,12 +33,6 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
-import org.apache.commons.lang3.StringUtils;
-import org.jboss.jandex.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * DaprProcessor
@@ -58,7 +60,7 @@ class DaprProcessor {
 
     @BuildStep
     void addDaprEndpoint(BuildProducer<RouteBuildItem> routeBuildItemBuildProducer,
-                         NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
+            NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprConfigHandler()));
 
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprSubscribeHandler()));
@@ -66,7 +68,7 @@ class DaprProcessor {
 
     @BuildStep
     void addActorEndpoint(BuildProducer<RouteBuildItem> routeBuildItemBuildProducer,
-                          NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
+            NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
         routeBuildItemBuildProducer
                 .produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new ActorDeactivateHandler()));
         routeBuildItemBuildProducer
@@ -161,7 +163,7 @@ class DaprProcessor {
     }
 
     private RouteBuildItem getDaprRouteBuildItem(NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
-                                                 AbstractDaprHandler handler) {
+            AbstractDaprHandler handler) {
         return nonApplicationRootPathBuildItem.routeBuilder()
                 .nestedRoute(handler.baseRoute(), handler.subRoute())
                 .handler(handler)
