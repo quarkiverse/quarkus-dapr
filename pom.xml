@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.version>2.8.0.Final</quarkus.version>
-        <dapr.version>1.4.0</dapr.version>
+        <dapr.version>1.5.0</dapr.version>
     </properties>
     <dependencyManagement>
         <dependencies>
