@@ -1,6 +1,6 @@
 # Quarkus - Dapr
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Welcome to Quarkiverse!
@@ -44,6 +44,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://zhfeng.github.io/"><img src="https://avatars.githubusercontent.com/u/1246139?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Amos Feng</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=zhfeng" title="Code">💻</a> <a href="#maintenance-zhfeng" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://www.naah69.com"><img src="https://avatars.githubusercontent.com/u/25682169?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Naah</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=naah69" title="Code">💻</a> <a href="#maintenance-naah69" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://skyao.io"><img src="https://avatars.githubusercontent.com/u/1582369?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sky Ao</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=skyao" title="Code">💻</a> <a href="#maintenance-skyao" title="Maintenance">🚧</a></td>
   </tr>
 </table>
 
