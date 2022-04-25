@@ -15,6 +15,7 @@ import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.dapr.client.domain.CloudEvent;
@@ -22,26 +23,27 @@ import io.dapr.client.domain.CloudEvent;
 /**
  * CloudEventReader
  *
- * @author nayan
+ * @author naah69
  * @date 2022/4/25 10:04 AM
  */
 @Provider
 @Produces(CloudEvent.CONTENT_TYPE)
-public class CloudEventReader<T> implements MessageBodyReader<CloudEvent<T>> {
+public class CloudEventReader implements MessageBodyReader<CloudEvent> {
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type == CloudEvent.class;
     }
 
     @Override
-    public CloudEvent<T> readFrom(Class<CloudEvent<T>> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+    public CloudEvent readFrom(Class<CloudEvent> type, Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
         byte[] bytes = getBytes(entityStream);
         if (bytes.length == 0) {
             throw new NoContentException("Cannot create JsonObject");
         }
         ObjectMapper objectMapper = CDI.current().select(ObjectMapper.class).get();
-        return objectMapper.readValue(bytes, type);
+        JavaType javaType = objectMapper.getTypeFactory().constructType(genericType);
+        return objectMapper.readValue(bytes, javaType);
     }
 
     private static byte[] getBytes(InputStream entityStream) throws IOException {

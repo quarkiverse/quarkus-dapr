@@ -26,6 +26,6 @@ public class DaprResourceTest {
                 .then()
                 .statusCode(200)
                 .body(is(
-                        "[{\"pubsubName\":\"messagebus\",\"topic\":\"topic2\",\"route\":\"/pubsub/topic2\",\"metadata\":{}}]"));
+                        "[{\"pubsubName\":\"messagebus\",\"topic\":\"topic2\",\"route\":\"/pubsub/topic2\",\"metadata\":{}},{\"pubsubName\":\"messagebus\",\"topic\":\"topic3\",\"route\":\"/pubsub/topic3\",\"metadata\":{}},{\"pubsubName\":\"messagebus\",\"topic\":\"topic4\",\"route\":\"/pubsub/topic4\",\"metadata\":{}}]"));
     }
 }
