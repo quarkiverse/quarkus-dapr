@@ -16,6 +16,8 @@
     <modules>
         <module>deployment</module>
         <module>runtime</module>
+        <module>integration-tests</module>
+        <module>demo</module>
     </modules>
     <properties>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
@@ -81,6 +83,7 @@
                 </property>
             </activation>
             <modules>
+                <module>demo</module>
                 <module>integration-tests</module>
             </modules>
         </profile>
