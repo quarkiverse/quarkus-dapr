@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.quarkiverse.dapr.it;
+package io.quarkiverse.dapr.demo;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -39,21 +39,27 @@ public class PubsubResource {
 
     @GET
     public String hello() {
-        return "Hello, this is quarkus-dapr demo app2";
+        return "Hello, this is quarkus-dapr demo app1";
+    }
+
+    @GET
+    @Path("/trigger/topic1")
+    public String triggerSendEvent2Topic1() {
+        String content = counter.getAndIncrement() + "-app1";
+        dapr.publishEvent("messagebus", "topic1", content.getBytes(StandardCharsets.UTF_8),
+                new HashMap<>());
+        System.out.println("App1 succeeds to send event to topic1 with content=" + content);
+
+        return "App1 succeeds to send event to topic1 with content=" + content;
     }
 
     @POST
-    @Path("/topic1")
-    @Topic(name = "topic1", pubsubName = "messagebus")
-    public String eventOnTopic1(String content) {
-        System.out.println("App2 received event from topic1: content=" + content);
+    @Path("/topic2")
+    @Topic(name = "topic2", pubsubName = "messagebus")
+    public String eventOnTopic2(String content) {
+        System.out.println("App1 received event from topic2: content=" + content);
 
-        content = "content" + "-app2";
-        dapr.publishEvent("messagebus", "topic2", content.getBytes(StandardCharsets.UTF_8),
-                new HashMap<>());
-        System.out.println("App1 sent event to topic2 with content=" + content);
-
-        return "App2 received event from topic1";
+        return "App1 received event from topic2";
     }
 
 }

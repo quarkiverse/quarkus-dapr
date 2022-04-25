@@ -1,4 +1,4 @@
-package io.quarkiverse.dapr.it;
+package io.quarkiverse.dapr.demo;
 
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.annotations.QuarkusMain;

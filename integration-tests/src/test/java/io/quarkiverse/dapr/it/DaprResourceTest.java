@@ -1,4 +1,4 @@
-package io.quarkiverse.dapr.it;
+package io.quarkiverse.dapr.demo;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;

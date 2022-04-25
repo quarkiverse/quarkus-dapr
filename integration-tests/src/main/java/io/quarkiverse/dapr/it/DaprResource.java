@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.quarkiverse.dapr.it;
+package io.quarkiverse.dapr.demo;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
