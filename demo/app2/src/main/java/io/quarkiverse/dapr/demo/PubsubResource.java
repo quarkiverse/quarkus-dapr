@@ -16,40 +16,44 @@
  */
 package io.quarkiverse.dapr.demo;
 
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import io.dapr.Topic;
+import io.quarkiverse.dapr.core.SyncDaprClient;
 
-@Path("/dapr")
+@Path("/pubsub")
 @ApplicationScoped
-public class DaprResource {
-    // add some rest methods here
+public class PubsubResource {
+    private final AtomicInteger counter = new AtomicInteger(1);
+
+    @Inject
+    SyncDaprClient dapr;
 
     @GET
     public String hello() {
-        return "Hello dapr";
-    }
-
-    @GET
-    @Path("/1")
-    @Topic(name = "test-topic1", pubsubName = "rocketmq")
-    public String postTopic1() {
-        return "Hello dapr";
+        return "Hello, this is quarkus-dapr demo app2";
     }
 
     @POST
-    @Topic(name = "test-topic2", pubsubName = "rocketmq")
-    public String postTopic2() {
-        return "Hello dapr";
+    @Path("/topic1")
+    @Topic(name = "topic1", pubsubName = "messagebus")
+    public String eventOnTopic1(String content) {
+        System.out.println("App2 received event from topic1: content=" + content);
+
+        content = "content" + "-app2";
+        dapr.publishEvent("messagebus", "topic2", content.getBytes(StandardCharsets.UTF_8),
+                new HashMap<>());
+        System.out.println("App1 sent event to topic2 with content=" + content);
+
+        return "App2 received event from topic1";
     }
 
-    @POST
-    @Path("/topic3")
-    @Topic(name = "test-topic3", pubsubName = "rocketmq")
-    public String postTopic3() {
-        return "Hello dapr";
-    }
 }
