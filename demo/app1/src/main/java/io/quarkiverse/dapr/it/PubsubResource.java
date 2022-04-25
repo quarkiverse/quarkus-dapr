@@ -56,9 +56,7 @@ public class PubsubResource {
     @POST
     @Path("/topic2")
     @Topic(name = "topic2", pubsubName = "messagebus")
-    public String eventOnTopic2() {
-        // TODO: how to get the content of event?
-        String content = "";
+    public String eventOnTopic2(String content) {
         System.out.println("App1 received event from topic2: content=" + content);
 
         return "App1 received event from topic2";

@@ -45,12 +45,10 @@ public class PubsubResource {
     @POST
     @Path("/topic1")
     @Topic(name = "topic1", pubsubName = "messagebus")
-    public String eventOnTopic1() {
-        // TODO: how to get the content of event?
-        String content = "";
+    public String eventOnTopic1(String content) {
         System.out.println("App2 received event from topic1: content=" + content);
 
-        content = content + "-app2";
+        content = "content" + "-app2";
         dapr.publishEvent("messagebus", "topic2", content.getBytes(StandardCharsets.UTF_8),
                 new HashMap<>());
         System.out.println("App1 sent event to topic2 with content=" + content);
