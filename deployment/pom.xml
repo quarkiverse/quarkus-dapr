@@ -23,9 +23,13 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-grpc-deployment</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.quarkus</groupId>-->
+<!--            <artifactId>quarkus-jackson-deployment</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jackson-deployment</artifactId>
+            <artifactId>quarkus-resteasy-jackson-deployment</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.dapr</groupId>
