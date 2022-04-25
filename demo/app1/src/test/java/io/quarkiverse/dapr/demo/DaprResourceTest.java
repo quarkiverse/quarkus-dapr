@@ -13,10 +13,10 @@ public class DaprResourceTest {
     @Test
     public void testHelloEndpoint() {
         given()
-                .when().get("/dapr")
+                .when().get("/pubsub")
                 .then()
                 .statusCode(200)
-                .body(is("Hello dapr"));
+                .body(is("Hello, this is quarkus-dapr demo app1"));
     }
 
     @Test
@@ -26,6 +26,6 @@ public class DaprResourceTest {
                 .then()
                 .statusCode(200)
                 .body(is(
-                        "[{\"pubsubName\":\"rocketmq\",\"topic\":\"test-topic2\",\"route\":\"/dapr\",\"metadata\":{}},{\"pubsubName\":\"rocketmq\",\"topic\":\"test-topic3\",\"route\":\"/dapr/topic3\",\"metadata\":{}}]"));
+                        "[{\"pubsubName\":\"messagebus\",\"topic\":\"topic2\",\"route\":\"/pubsub/topic2\",\"metadata\":{}}]"));
     }
 }
