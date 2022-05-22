@@ -26,13 +26,14 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.version>2.9.1.Final</quarkus.version>
         <dapr.version>1.5.0</dapr.version>
+        <okhttp.version>4.9.3</okhttp.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
-                <version>4.9.3</version>
+                <version>${okhttp.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.quarkus</groupId>
