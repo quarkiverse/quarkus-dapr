@@ -7,5 +7,5 @@ metadata:
     - sidecar
   guide: "https://quarkiverse.github.io/quarkiverse-docs/quarkus-dapr/dev/index.html"
   categories:
-    - "sidecar"
+    - "miscellaneous"
   status: "preview"
