@@ -20,7 +20,7 @@
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <quarkus.version>2.9.1.Final</quarkus.version>
+        <quarkus.version>2.9.2.Final</quarkus.version>
         <dapr.version>1.5.0</dapr.version>
         <okhttp.version>4.9.3</okhttp.version>
     </properties>
