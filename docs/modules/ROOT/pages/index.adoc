@@ -1,7 +1,32 @@
 = Quarkus - Dapr
 :extension-status: preview
 
-Describe what the extension does here.
+== Introduction
+
+=== What is Dapr?
+
+Dapr is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and 
+stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks. 
+
+Leveraging the benefits of a sidecar architecture, Dapr helps you tackle the challenges that come with building 
+microservices and keeps your code platform agnostic.
+
+For more information about Dapr, please go https://dapr.io/.
+
+===  What is Quarkus-Dapr?
+
+Quarkus Dapr is a Quarkus extension to integrate with Dapr.
+
+Quarkus Dapr Extension enables Java developers to create ultra lightweight Java native applications for Function 
+Computing and FaaS scenes, which is also particularly suitable for running as serverless. 
+
+With the help of Dapr, these ultra lightweight Java native applications can easily interact with external application
+and resources. Dapr provides many useful building blocks to build modern distributed application: service invocation, 
+state management, input/output bindings, publish & subscribe, secret management......
+
+Because of the advantages of sidecar model, the native applications can benefit from Dapr's distributed capabilities
+while remain lightweight without introducing too many dependencies. This is not only helping to keep the size of java
+native applications, but also making the native applications easy to build as native images.
 
 == Installation
 
@@ -15,6 +40,34 @@ In your `pom.xml` file, add:
     <artifactId>quarkus-dapr</artifactId>
 </dependency>
 ----
+
+== Examples
+
+With Quarkus Dapr Extension, it's pretty easy for java developers.
+
+=== publish & subscribe
+
+To publish events to your message broker, just inject a dapr client to your bean and call it's publishEvent() method:
+
+[source,java]
+----
+@Inject
+SyncDaprClient dapr;
+
+dapr.publishEvent("messagebus", "topic1", content.getBytes(StandardCharsets.UTF_8), new HashMap<>());
+----
+
+To subscribe events for your message broker, adding some annotations on your method is enough:
+
+[source,java]
+----
+@POST
+@Path("/topic1")
+@Topic(name = "topic1", pubsubName = "messagebus")
+public String eventOnTopic2(String content) {......}
+----
+
+For more details and hands-on experiences, please reference to our link:https://github.com/quarkiverse/quarkus-dapr/blob/main/demo/README.md[Demo].
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference

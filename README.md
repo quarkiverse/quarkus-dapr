@@ -1,32 +1,99 @@
 # Quarkus - Dapr
+[![Build](https://github.com/quarkiverse/quarkus-dapr/workflows/Build/badge.svg?branch=main)](https://github.com/quarkiverse/quarkus-dapr/actions?query=workflow%3ABuild)
+[![License](https://img.shields.io/github/license/quarkiverse/quarkus-dapr)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Central](https://img.shields.io/maven-central/v/io.quarkiverse.dapr/quarkus-dapr-parent?color=green)](https://search.maven.org/search?q=g:io.quarkiverse.dapr%20AND%20a:quarkus-dapr-parent)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-## Welcome to Quarkiverse!
+## Introduction
 
-Congratulations and thank you for creating a new Quarkus extension project in Quarkiverse!
+### What is Quarkus?
 
-Feel free to replace this content with the proper description of your new project and necessary instructions how to use
-and contribute to it.
+Traditional Java stacks were engineered for monolithic applications with long startup times and large memory 
+requirements in a world where the cloud, containers, and Kubernetes did not exist. Java frameworks needed to evolve 
+to meet the needs of this new world.
 
-You can find the basic info, Quarkiverse policies and conventions
-in [the Quarkiverse wiki](https://github.com/quarkiverse/quarkiverse/wiki).
+Quarkus was created to enable Java developers to create applications for a modern, cloud-native world. Quarkus is 
+a Kubernetes-native Java framework tailored for GraalVM and HotSpot, crafted from best-of-breed Java libraries and 
+standards. The goal is to make Java the leading platform in Kubernetes and serverless environments while offering 
+developers a framework to address a wider range of distributed application architectures.
 
-In case you are creating a Quarkus extension project for the first time, please
-follow [Building My First Extension](https://quarkus.io/guides/building-my-first-extension) guide.
+![](https://quarkus.io/assets/images/quarkus_metrics_graphic_bootmem_wide.png)
 
-Other useful articles related to Quarkus extension development can be found under
-the [Writing Extensions](https://quarkus.io/guides/#writing-extensions) guide category on
-the [Quarkus.io](http://quarkus.io) website.
+For more information about Quarkus, please go https://quarkus.io/.
 
-Thanks again, good luck and have fun!
+### What is Dapr?
 
-## Documentation
+Dapr is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and 
+stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks. 
 
-The documentation for this extension should be maintained as part of this repository and it is stored in the `docs/`
-directory.
+Leveraging the benefits of a sidecar architecture, Dapr helps you tackle the challenges that come with building 
+microservices and keeps your code platform agnostic.
 
-The layout should follow
-the [Antora's Standard File and Directory Set](https://docs.antora.org/antora/2.3/standard-directories/).
+![](https://dapr.io/images/building-blocks.png)
 
-Once the docs are ready to be published, please open a PR including this repository in
-the [Quarkiverse Docs Antora playbook](https://github.com/quarkiverse/quarkiverse-docs/blob/main/antora-playbook.yml#L7)
-. See an example [here](https://github.com/quarkiverse/quarkiverse-docs/pull/1).
+For more information about Dapr, please go https://dapr.io/.
+
+### What is Quarkus-Dapr?
+
+Quarkus Dapr is a Quarkus extension to integrate with Dapr.
+
+Quarkus Dapr Extension enables Java developers to create ultra lightweight Java native applications for Function 
+Computing and FaaS scenes, which is also particularly suitable for running as serverless. 
+
+With the help of Dapr, these ultra lightweight Java native applications can easily interact with external application
+and resources. Dapr provides many useful building blocks to build modern distributed application: service invocation, 
+state management, input/output bindings, publish & subscribe, secret management......
+
+Because of the advantages of sidecar model, the native applications can benefit from Dapr's distributed capabilities
+while remain lightweight without introducing too many dependencies. This is not only helping to keep the size of java
+native applications, but also making the native applications easy to build as native images.
+
+## Examples
+
+With Quarkus Dapr Extension, it's pretty easy for java developers.
+
+### publish & subscribe
+
+To publish events to your message broker, just inject a dapr client to your bean and call it's publishEvent() method:
+
+```java
+    @Inject
+    SyncDaprClient dapr;
+
+    dapr.publishEvent("messagebus", "topic1", content.getBytes(StandardCharsets.UTF_8), new HashMap<>());
+```
+
+To subscribe events for your message broker, adding some annotations on your method is enough:
+
+```java
+@POST
+@Path("/topic1")
+@Topic(name = "topic1", pubsubName = "messagebus")
+public String eventOnTopic2(String content) {......}
+```
+
+For more details and hands-on experiences, please reference to our [Demo](./demo/README.md).
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://zhfeng.github.io/"><img src="https://avatars.githubusercontent.com/u/1246139?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Amos Feng</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=zhfeng" title="Code">💻</a> <a href="#maintenance-zhfeng" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://www.naah69.com"><img src="https://avatars.githubusercontent.com/u/25682169?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Naah</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=naah69" title="Code">💻</a> <a href="#maintenance-naah69" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://skyao.io"><img src="https://avatars.githubusercontent.com/u/1582369?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sky Ao</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=skyao" title="Code">💻</a> <a href="#maintenance-skyao" title="Maintenance">🚧</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

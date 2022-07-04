@@ -1,0 +1,45 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "zhfeng",
+      "name": "Amos Feng",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1246139?v=4",
+      "profile": "https://zhfeng.github.io/",
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "naah69",
+      "name": "Naah",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25682169?v=4",
+      "profile": "https://www.naah69.com",
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "skyao",
+      "name": "Sky Ao",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1582369?v=4",
+      "profile": "https://skyao.io",
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "quarkus-dapr",
+  "projectOwner": "quarkiverse",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
