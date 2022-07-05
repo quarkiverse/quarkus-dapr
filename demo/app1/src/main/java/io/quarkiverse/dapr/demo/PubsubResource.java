@@ -27,6 +27,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import io.dapr.Topic;
+import io.dapr.client.domain.CloudEvent;
 import io.quarkiverse.dapr.core.SyncDaprClient;
 
 @Path("/pubsub")
@@ -60,6 +61,27 @@ public class PubsubResource {
         System.out.println("App1 received event from topic2: content=" + content);
 
         return "App1 received event from topic2";
+    }
+
+    @POST
+    @Path("/topic3")
+    @Topic(name = "topic3", pubsubName = "messagebus")
+    public String eventOnTopic3(CloudEvent<String> event) {
+        String content = event.getData();
+        System.out.println("App1 received event from topic3: content=" + content);
+
+        return "App1 received event from topic3";
+    }
+
+    @POST
+    @Path("/topic4")
+    @Topic(name = "topic4", pubsubName = "messagebus")
+    public String eventOnTopic4(CloudEvent<TestData> event) {
+        TestData testData = event.getData();
+        String content = testData.getContent();
+        System.out.println("App1 received event from topic4: content=" + content);
+
+        return "App1 received event from topic4";
     }
 
 }

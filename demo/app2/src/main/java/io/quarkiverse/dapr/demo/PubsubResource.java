@@ -53,6 +53,18 @@ public class PubsubResource {
                 new HashMap<>());
         System.out.println("App1 sent event to topic2 with content=" + content);
 
+        content = "content" + "-app3";
+        dapr.publishEvent("messagebus", "topic3", content.getBytes(StandardCharsets.UTF_8),
+                new HashMap<>());
+        System.out.println("App1 sent event to topic3 with content=" + content);
+
+        content = "content" + "-app4";
+        TestData testData = new TestData();
+        testData.setContent(content);
+        dapr.publishEvent("messagebus", "topic4", testData,
+                new HashMap<>());
+        System.out.println("App1 sent event to topic4 with object content=" + content);
+
         return "App2 received event from topic1";
     }
 
