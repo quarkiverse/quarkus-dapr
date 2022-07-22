@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.version>2.11.0.Final</quarkus.version>
-        <dapr.version>1.5.0</dapr.version>
+        <dapr.version>1.6.0</dapr.version>
         <okhttp.version>4.10.0</okhttp.version>
     </properties>
     <dependencyManagement>
