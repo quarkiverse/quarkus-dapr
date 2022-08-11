@@ -3,6 +3,8 @@ package io.quarkiverse.dapr.core;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.microprofile.config.ConfigProvider;
+
 import io.dapr.client.DaprClient;
 import io.dapr.client.DaprClientBuilder;
 import io.dapr.client.domain.*;
@@ -25,6 +27,8 @@ public class SyncDaprClient implements AutoCloseable {
         this.daprClient = daprClient;
     }
 
+    private String defaultPubSubName = ConfigProvider.getConfig().getValue("dapr.pub-sub.name", String.class);
+
     /**
      * Waits for the sidecar, giving up after timeout.
      *
@@ -33,6 +37,29 @@ public class SyncDaprClient implements AutoCloseable {
      */
     public void waitForSidecar(int timeoutInMilliseconds) {
         daprClient.waitForSidecar(timeoutInMilliseconds).block();
+    }
+
+    /**
+     * Publish an event.
+     *
+     * @param topicName the topicName where the event will be published.
+     * @param data the event's data to be published, use byte[] for skipping serialization.
+     * @return a Mono plan of type void.
+     */
+    public void publishEvent(String topicName, Object data) {
+        daprClient.publishEvent(defaultPubSubName, topicName, data).block();
+    }
+
+    /**
+     * Publish an event.
+     *
+     * @param topicName the topicName where the event will be published.
+     * @param data the event's data to be published, use byte[] for skipping serialization.
+     * @param metadata The metadata for the published event.
+     * @return a Mono plan of type void.
+     */
+    public void publishEvent(String topicName, Object data, Map<String, String> metadata) {
+        daprClient.publishEvent(defaultPubSubName, topicName, data, metadata).block();
     }
 
     /**
