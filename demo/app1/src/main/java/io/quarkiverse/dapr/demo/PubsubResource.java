@@ -47,7 +47,7 @@ public class PubsubResource {
     @Path("/trigger/topic1")
     public String triggerSendEvent2Topic1() {
         String content = counter.getAndIncrement() + "-app1";
-        dapr.publishEvent("messagebus", "topic1", content.getBytes(StandardCharsets.UTF_8),
+        dapr.publishEvent("topic1", content.getBytes(StandardCharsets.UTF_8),
                 new HashMap<>());
         System.out.println("App1 succeeds to send event to topic1 with content=" + content);
 
@@ -56,7 +56,7 @@ public class PubsubResource {
 
     @POST
     @Path("/topic2")
-    @Topic(name = "topic2", pubsubName = "messagebus")
+    @Topic(name = "topic2")
     public String eventOnTopic2(String content) {
         System.out.println("App1 received event from topic2: content=" + content);
 
@@ -65,7 +65,7 @@ public class PubsubResource {
 
     @POST
     @Path("/topic3")
-    @Topic(name = "topic3", pubsubName = "messagebus")
+    @Topic(name = "topic3")
     public String eventOnTopic3(CloudEvent<String> event) {
         String content = event.getData();
         System.out.println("App1 received event from topic3: content=" + content);
@@ -75,7 +75,7 @@ public class PubsubResource {
 
     @POST
     @Path("/topic4")
-    @Topic(name = "topic4", pubsubName = "messagebus")
+    @Topic(name = "topic4")
     public String eventOnTopic4(CloudEvent<TestData> event) {
         TestData testData = event.getData();
         String content = testData.getContent();

@@ -1,9 +1,18 @@
 package io.quarkiverse.dapr.deployment;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.jandex.*;
+import org.jboss.jandex.AnnotationInstance;
+import org.jboss.jandex.AnnotationTarget;
+import org.jboss.jandex.AnnotationValue;
+import org.jboss.jandex.ClassInfo;
+import org.jboss.jandex.DotName;
+import org.jboss.jandex.MethodInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dapr.Topic;
 import io.dapr.actors.runtime.ActorRuntimeConfig;
 import io.dapr.client.domain.CloudEvent;
+import io.quarkiverse.dapr.config.DaprConfig;
 import io.quarkiverse.dapr.core.DaprTopicSubscription;
 import io.quarkiverse.dapr.endpoint.actor.ActorDeactivateHandler;
 import io.quarkiverse.dapr.endpoint.actor.ActorInvokeMethodHandler;
@@ -94,7 +104,8 @@ class DaprProcessor {
     }
 
     @BuildStep
-    void daprTopicBuildItems(BuildProducer<DaprTopicBuildItem> topicProducer, CombinedIndexBuildItem indexBuildItem) {
+    void daprTopicBuildItems(BuildProducer<DaprTopicBuildItem> topicProducer, CombinedIndexBuildItem indexBuildItem,
+            DaprConfig daprConfig) {
         for (AnnotationInstance i : indexBuildItem.getIndex().getAnnotations(DAPR_TOPIC)) {
             if (i.target().kind() == AnnotationTarget.Kind.METHOD) {
 
@@ -134,14 +145,20 @@ class DaprProcessor {
                         }
                         path.replaceAll("//", "/");
 
-                        String pubsubName = topic.value("pubsubName").asString();
+                        String pubsubName = Optional.ofNullable(topic.value("pubsubName")).map(AnnotationValue::asString)
+                                .orElse(daprConfig.pubSub.name);
+
                         String topicName = topic.value("name").asString();
 
                         try {
                             AnnotationValue metadataValue = topic.value("metadata");
-                            Map<String, String> metadata = Objects.nonNull(metadataValue)
+                            Map<String, String> metadata = Objects.nonNull(daprConfig.pubSub.metadata)
+                                    ? daprConfig.pubSub.metadata
+                                    : new HashMap<>();
+                            Map<String, String> topicMetadata = Objects.nonNull(metadataValue)
                                     ? objectMapper.readValue(metadataValue.asString(), MAP_TYPE)
                                     : new HashMap<>();
+                            metadata.putAll(topicMetadata);
                             topicProducer.produce(new DaprTopicBuildItem(
                                     pubsubName,
                                     topicName,
