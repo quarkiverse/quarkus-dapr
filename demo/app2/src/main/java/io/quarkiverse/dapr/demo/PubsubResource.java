@@ -44,24 +44,24 @@ public class PubsubResource {
 
     @POST
     @Path("/topic1")
-    @Topic(name = "topic1", pubsubName = "messagebus")
+    @Topic(name = "topic1")
     public String eventOnTopic1(String content) {
         System.out.println("App2 received event from topic1: content=" + content);
 
         content = "content" + "-app2";
-        dapr.publishEvent("messagebus", "topic2", content.getBytes(StandardCharsets.UTF_8),
+        dapr.publishEvent("topic2", content.getBytes(StandardCharsets.UTF_8),
                 new HashMap<>());
         System.out.println("App1 sent event to topic2 with content=" + content);
 
         content = "content" + "-app3";
-        dapr.publishEvent("messagebus", "topic3", content.getBytes(StandardCharsets.UTF_8),
+        dapr.publishEvent("topic3", content.getBytes(StandardCharsets.UTF_8),
                 new HashMap<>());
         System.out.println("App1 sent event to topic3 with content=" + content);
 
         content = "content" + "-app4";
         TestData testData = new TestData();
         testData.setContent(content);
-        dapr.publishEvent("messagebus", "topic4", testData,
+        dapr.publishEvent("topic4", testData,
                 new HashMap<>());
         System.out.println("App1 sent event to topic4 with object content=" + content);
 
