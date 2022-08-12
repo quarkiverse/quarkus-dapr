@@ -1,21 +1,10 @@
 package io.quarkiverse.dapr.deployment;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
-import javax.ws.rs.core.MediaType;
-
+import io.quarkus.resteasy.reactive.spi.MessageBodyReaderBuildItem;
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.AnnotationTarget;
-import org.jboss.jandex.AnnotationValue;
-import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.DotName;
-import org.jboss.jandex.MethodInfo;
+import org.jboss.jandex.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +34,10 @@ import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.CombinedIndexBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
-import io.quarkus.resteasy.reactive.spi.MessageBodyReaderBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
+
+import javax.ws.rs.core.MediaType;
 
 /**
  * DaprProcessor
@@ -102,8 +92,7 @@ class DaprProcessor {
 
     @BuildStep
     void vertxProviders(BuildProducer<MessageBodyReaderBuildItem> providers) {
-        providers.produce(new MessageBodyReaderBuildItem(CloudEventReader.class.getName(), CloudEvent.class.getName(),
-                Collections.singletonList(MediaType.APPLICATION_JSON)));
+        providers.produce(new MessageBodyReaderBuildItem(CloudEventReader.class.getName(),CloudEvent.class.getName(),Collections.singletonList(MediaType.APPLICATION_JSON)));
     }
 
     @BuildStep
