@@ -1,15 +1,7 @@
 package io.quarkiverse.dapr.deployment;
 
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jboss.jandex.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.dapr.Topic;
 import io.dapr.actors.runtime.ActorRuntimeConfig;
 import io.dapr.client.domain.CloudEvent;
@@ -33,9 +25,26 @@ import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.CombinedIndexBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
-import io.quarkus.resteasy.common.spi.ResteasyJaxrsProviderBuildItem;
+import io.quarkus.resteasy.reactive.spi.MessageBodyReaderBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
+import org.apache.commons.lang3.StringUtils;
+import org.jboss.jandex.AnnotationInstance;
+import org.jboss.jandex.AnnotationTarget;
+import org.jboss.jandex.AnnotationValue;
+import org.jboss.jandex.ClassInfo;
+import org.jboss.jandex.DotName;
+import org.jboss.jandex.MethodInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.MediaType;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * DaprProcessor
@@ -63,7 +72,7 @@ class DaprProcessor {
 
     @BuildStep
     void addDaprEndpoint(BuildProducer<RouteBuildItem> routeBuildItemBuildProducer,
-            NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
+                         NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprConfigHandler()));
 
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprSubscribeHandler()));
@@ -71,7 +80,7 @@ class DaprProcessor {
 
     @BuildStep
     void addActorEndpoint(BuildProducer<RouteBuildItem> routeBuildItemBuildProducer,
-            NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
+                          NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
         routeBuildItemBuildProducer
                 .produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new ActorDeactivateHandler()));
         routeBuildItemBuildProducer
@@ -89,8 +98,8 @@ class DaprProcessor {
     }
 
     @BuildStep
-    void vertxProviders(BuildProducer<ResteasyJaxrsProviderBuildItem> providers) {
-        providers.produce(new ResteasyJaxrsProviderBuildItem(CloudEventReader.class.getName()));
+    void vertxProviders(BuildProducer<MessageBodyReaderBuildItem> providers) {
+        providers.produce(new MessageBodyReaderBuildItem(CloudEventReader.class.getName(), CloudEvent.class.getName(), Collections.singletonList(MediaType.APPLICATION_JSON)));
     }
 
     @BuildStep
@@ -170,7 +179,7 @@ class DaprProcessor {
     }
 
     private RouteBuildItem getDaprRouteBuildItem(NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
-            AbstractDaprHandler handler) {
+                                                 AbstractDaprHandler handler) {
         return nonApplicationRootPathBuildItem.routeBuilder()
                 .nestedRoute(handler.baseRoute(), handler.subRoute())
                 .handler(handler)
