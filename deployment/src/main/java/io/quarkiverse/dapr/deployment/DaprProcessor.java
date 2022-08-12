@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.quarkus.resteasy.reactive.spi.MessageBodyReaderBuildItem;
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
@@ -45,10 +46,9 @@ import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.CombinedIndexBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
+import io.quarkus.resteasy.reactive.spi.MessageBodyReaderBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
-
-import javax.ws.rs.core.MediaType;
 
 /**
  * DaprProcessor
@@ -103,7 +103,8 @@ class DaprProcessor {
 
     @BuildStep
     void vertxProviders(BuildProducer<MessageBodyReaderBuildItem> providers) {
-        providers.produce(new MessageBodyReaderBuildItem(CloudEventReader.class.getName(),CloudEvent.class.getName(), Collections.singletonList(MediaType.APPLICATION_JSON)));
+        providers.produce(new MessageBodyReaderBuildItem(CloudEventReader.class.getName(), CloudEvent.class.getName(),
+                Collections.singletonList(MediaType.APPLICATION_JSON)));
     }
 
     @BuildStep
