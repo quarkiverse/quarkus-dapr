@@ -1,5 +1,6 @@
 package io.quarkiverse.dapr.deployment;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +103,7 @@ class DaprProcessor {
 
     @BuildStep
     void vertxProviders(BuildProducer<MessageBodyReaderBuildItem> providers) {
-        providers.produce(new MessageBodyReaderBuildItem(CloudEventReader.class.getName(),CloudEvent.class.getName(),Collections.singletonList(MediaType.APPLICATION_JSON)));
+        providers.produce(new MessageBodyReaderBuildItem(CloudEventReader.class.getName(),CloudEvent.class.getName(), Collections.singletonList(MediaType.APPLICATION_JSON)));
     }
 
     @BuildStep
