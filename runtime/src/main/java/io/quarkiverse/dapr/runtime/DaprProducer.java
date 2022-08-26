@@ -55,7 +55,7 @@ public class DaprProducer {
         return new SyncDaprClient(client);
     }
 
-    void onStop(@Observes ShutdownEvent ev,DaprClient client) {
+    void onStop(@Observes ShutdownEvent ev, DaprClient client) {
         client.shutdown().block();
     }
 }
