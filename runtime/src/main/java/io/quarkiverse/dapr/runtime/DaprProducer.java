@@ -1,6 +1,7 @@
 package io.quarkiverse.dapr.runtime;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
 
@@ -12,6 +13,7 @@ import io.quarkiverse.dapr.core.SyncDaprClient;
 import io.quarkiverse.dapr.serializer.JacksonDaprObjectSerializer;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.Unremovable;
+import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.Startup;
 
 /**
@@ -51,5 +53,9 @@ public class DaprProducer {
     @Unremovable
     public SyncDaprClient syncDaprClient(DaprClient client) {
         return new SyncDaprClient(client);
+    }
+
+    void onStop(@Observes ShutdownEvent ev, DaprClient client) {
+        client.shutdown().block();
     }
 }
