@@ -31,6 +31,12 @@ public class DaprConfig {
         public String name;
 
         /**
+         * pub sub type
+         */
+        @ConfigItem(defaultValue = "redis")
+        public String type;
+
+        /**
          * pub sub default metadata
          */
         @ConfigItem
