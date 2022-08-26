@@ -16,7 +16,7 @@ import io.dapr.utils.TypeRef;
  */
 public class JacksonDaprObjectSerializer implements DaprObjectSerializer {
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public JacksonDaprObjectSerializer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
