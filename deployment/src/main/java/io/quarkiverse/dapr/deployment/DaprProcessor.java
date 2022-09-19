@@ -120,7 +120,7 @@ class DaprProcessor {
                         .findFirst();
 
                 methodPostOp.ifPresent(mp -> {
-                    Optional<AnnotationInstance> classPathOp = classInfo.annotations().entrySet().stream()
+                    Optional<AnnotationInstance> classPathOp = classInfo.annotationsMap().entrySet().stream()
                             .filter(entry -> entry.getKey().equals(RESTEASY_PATH))
                             .map(Map.Entry::getValue)
                             .flatMap(list -> list.stream())
