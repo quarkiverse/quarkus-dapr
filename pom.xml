@@ -8,7 +8,7 @@
     </parent>
     <groupId>io.quarkiverse.dapr</groupId>
     <artifactId>quarkus-dapr-parent</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Quarkus - Dapr - Parent</name>
     <modules>
@@ -85,8 +85,4 @@
             </modules>
         </profile>
     </profiles>
-
-  <scm>
-    <tag>1.0.3</tag>
-  </scm>
 </project>
