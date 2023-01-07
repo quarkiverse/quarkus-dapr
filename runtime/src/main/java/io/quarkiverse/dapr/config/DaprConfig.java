@@ -1,5 +1,6 @@
 package io.quarkiverse.dapr.config;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import io.quarkus.runtime.annotations.ConfigGroup;
@@ -13,22 +14,23 @@ import io.quarkus.runtime.annotations.ConfigRoot;
  * @author nayan
  * @date 2022/8/11 13:44
  */
-@ConfigRoot(prefix = "", name = "dapr", phase = ConfigPhase.BUILD_AND_RUN_TIME_FIXED)
+@ConfigRoot(name = "dapr", phase = ConfigPhase.BUILD_AND_RUN_TIME_FIXED)
 public class DaprConfig {
+
+    /**
+     * default pub sub config
+     */
+    @ConfigItem(defaultValue = "redis")
+    public String defaultPubSub;
 
     /**
      * pub sub config
      */
     @ConfigItem
-    public DaprPubSubConfig pubSub;
+    public Map<String, DaprPubSubConfig> pubSub = new HashMap<>();
 
     @ConfigGroup
     public static class DaprPubSubConfig {
-        /**
-         * pub sub name
-         */
-        @ConfigItem(defaultValue = "redis")
-        public String name;
 
         /**
          * pub sub type
@@ -37,9 +39,17 @@ public class DaprConfig {
         public String type;
 
         /**
-         * pub sub default metadata
+         * publish pub sub default metadata
          */
         @ConfigItem
-        public Map<String, String> metadata;
+        public Map<String, String> publishMetadata = new HashMap<>();
+
+        /**
+         * consume pub sub default metadata
+         */
+        @ConfigItem
+        public Map<String, String> consumeMetadata = new HashMap<>();
+
     }
+
 }

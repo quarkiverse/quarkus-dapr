@@ -19,6 +19,7 @@ import org.jboss.jandex.MethodInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,6 +35,7 @@ import io.quarkiverse.dapr.endpoint.actor.ActorInvokeTimerHandler;
 import io.quarkiverse.dapr.endpoint.dapr.AbstractDaprHandler;
 import io.quarkiverse.dapr.endpoint.dapr.DaprConfigHandler;
 import io.quarkiverse.dapr.endpoint.dapr.DaprSubscribeHandler;
+import io.quarkiverse.dapr.endpoint.health.DaprHealthzHandler;
 import io.quarkiverse.dapr.jackson.DaprJacksonModuleCustomizer;
 import io.quarkiverse.dapr.resteasy.CloudEventReader;
 import io.quarkiverse.dapr.runtime.DaprProducer;
@@ -75,11 +77,18 @@ class DaprProcessor {
     }
 
     @BuildStep
+    void addHealthzEndpoint(BuildProducer<RouteBuildItem> routeBuildItemBuildProducer,
+            NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
+        routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprHealthzHandler()));
+    }
+
+    @BuildStep
     void addDaprEndpoint(BuildProducer<RouteBuildItem> routeBuildItemBuildProducer,
             NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprConfigHandler()));
 
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprSubscribeHandler()));
+        routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprHealthzHandler()));
     }
 
     @BuildStep
@@ -110,6 +119,8 @@ class DaprProcessor {
     @BuildStep
     void daprTopicBuildItems(BuildProducer<DaprTopicBuildItem> topicProducer, CombinedIndexBuildItem indexBuildItem,
             DaprConfig daprConfig) {
+        Map<String, DaprConfig.DaprPubSubConfig> pubSubConfigMap = Optional.ofNullable(daprConfig.pubSub)
+                .orElse(new HashMap<>());
         for (AnnotationInstance i : indexBuildItem.getIndex().getAnnotations(DAPR_TOPIC)) {
             if (i.target().kind() == AnnotationTarget.Kind.METHOD) {
 
@@ -148,30 +159,48 @@ class DaprProcessor {
                             path += methodPath;
                         }
                         path.replaceAll("//", "/");
-
-                        String pubsubName = Optional.ofNullable(topic.value("pubsubName")).map(AnnotationValue::asString)
-                                .orElse(daprConfig.pubSub.name);
+                        String pubsubName = Optional.ofNullable(topic.value("pubsubName"))
+                                .map(AnnotationValue::asString)
+                                .orElse(daprConfig.defaultPubSub);
 
                         String topicName = topic.value("name").asString();
 
-                        try {
-                            AnnotationValue metadataValue = topic.value("metadata");
-                            Map<String, String> metadata = Objects.nonNull(daprConfig.pubSub.metadata)
-                                    ? daprConfig.pubSub.metadata
-                                    : new HashMap<>();
-                            Map<String, String> topicMetadata = Objects.nonNull(metadataValue)
-                                    ? objectMapper.readValue(metadataValue.asString(), MAP_TYPE)
-                                    : new HashMap<>();
-                            metadata.putAll(topicMetadata);
-                            topicProducer.produce(new DaprTopicBuildItem(
-                                    pubsubName,
-                                    topicName,
-                                    path,
-                                    metadata));
-                        } catch (Exception e) {
-                            log.error("dapr topic map to path error in class:{},topicName:{}", classInfo.name().toString(),
-                                    topicName, e);
-                        }
+                        String ruleMatch = Optional.ofNullable(topic.value("rule"))
+                                .map(AnnotationValue::asNested)
+                                .map(a -> a.value("match"))
+                                .map(AnnotationValue::asString)
+                                .orElse("");
+                        int rulePriority = Optional.ofNullable(topic.value("rule"))
+                                .map(AnnotationValue::asNested)
+                                .map(a -> a.value("priority"))
+                                .map(AnnotationValue::asInt)
+                                .orElse(0);
+
+                        AnnotationValue metadataValue = topic.value("metadata");
+
+                        Map<String, String> consumeMetadata = Optional.ofNullable(pubSubConfigMap.get(pubsubName))
+                                .map(a -> new HashMap(a.consumeMetadata))
+                                .orElse(new HashMap<>());
+                        Map<String, String> topicMetadata = Optional.ofNullable(metadataValue)
+                                .map(a -> {
+                                    try {
+                                        return objectMapper.readValue(a.asString(), MAP_TYPE);
+                                    } catch (JsonProcessingException e) {
+                                        log.error("dapr topic metadata to path error in class:{},topicName:{}",
+                                                classInfo.name().toString(),
+                                                topicName, e);
+                                        return null;
+                                    }
+                                })
+                                .orElse(new HashMap<>());
+                        consumeMetadata.putAll(topicMetadata);
+                        topicProducer.produce(new DaprTopicBuildItem(
+                                pubsubName,
+                                topicName,
+                                path,
+                                ruleMatch,
+                                rulePriority,
+                                consumeMetadata));
                     }
                 });
             }
@@ -185,6 +214,8 @@ class DaprProcessor {
             daprRuntimeRecorder.subscribeToTopics(
                     item.getPubSubName(),
                     item.getTopicName(),
+                    item.getMatch(),
+                    item.getPriority(),
                     item.getRoute(),
                     item.getMetadata());
         }

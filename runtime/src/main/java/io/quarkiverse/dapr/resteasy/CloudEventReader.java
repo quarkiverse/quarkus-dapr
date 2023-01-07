@@ -1,24 +1,29 @@
 package io.quarkiverse.dapr.resteasy;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.inject.spi.CDI;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.NoContentException;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.dapr.client.domain.CloudEvent;
+import io.quarkiverse.dapr.config.DaprConfig;
 
 /**
  * CloudEventReader
@@ -29,6 +34,11 @@ import io.dapr.client.domain.CloudEvent;
 @Provider
 @Produces(CloudEvent.CONTENT_TYPE)
 public class CloudEventReader implements MessageBodyReader<CloudEvent> {
+
+    private static final ObjectMapper OBJECT_MAPPER = CDI.current().select(ObjectMapper.class).get();
+    private static final DaprConfig DAPR_CONFIG = CDI.current().select(DaprConfig.class).get();
+    private static final Map<Type, JavaType> TYPE_CACHE = new ConcurrentHashMap<>();
+
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type == CloudEvent.class;
@@ -36,23 +46,39 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
 
     @Override
     public CloudEvent readFrom(Class<CloudEvent> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-            MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
-        byte[] bytes = getBytes(entityStream);
-        if (bytes.length == 0) {
-            throw new NoContentException("Cannot create JsonObject");
-        }
-        ObjectMapper objectMapper = CDI.current().select(ObjectMapper.class).get();
-        JavaType javaType = objectMapper.getTypeFactory().constructType(genericType);
-        return objectMapper.readValue(bytes, javaType);
+            MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+            throws IOException, WebApplicationException {
+        JavaType valueType = TYPE_CACHE.computeIfAbsent(genericType,
+                a -> OBJECT_MAPPER.getTypeFactory().constructType(genericType));
+        JsonNode jsonNode = OBJECT_MAPPER.readTree(entityStream);
+        return getCloudEvent(jsonNode, valueType);
+
     }
 
-    private static byte[] getBytes(InputStream entityStream) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[4096];
-        int len;
-        while ((len = entityStream.read(buffer)) != -1) {
-            baos.write(buffer, 0, len);
+    private static CloudEvent getCloudEvent(JsonNode jsonNode, JavaType valueType)
+            throws IOException {
+        String dataContentType = jsonNode.get("datacontenttype").asText();
+        switch (dataContentType) {
+            case MediaType.APPLICATION_JSON:
+                return OBJECT_MAPPER.treeToValue(jsonNode, valueType);
+            case MediaType.TEXT_PLAIN:
+                String data = jsonNode.get("data").asText();
+                return OBJECT_MAPPER.readValue(data, valueType);
+            case MediaType.APPLICATION_OCTET_STREAM:
+                byte[] binaryData = jsonNode.get("data_base64").binaryValue();
+                String pubsubname = jsonNode.get("pubsubname").asText();
+                String rawPayload = Optional.ofNullable(DAPR_CONFIG.pubSub.get(pubsubname))
+                        .map(a -> a.consumeMetadata)
+                        .map(a -> a.get("rawPayload"))
+                        .orElse("");
+                if (Objects.equals("true", rawPayload)) {
+                    JsonNode subJsonNode = OBJECT_MAPPER.readTree(binaryData);
+                    return getCloudEvent(subJsonNode, valueType);
+                }
+                return OBJECT_MAPPER.readValue(binaryData, valueType);
+            default:
+                throw new NotSupportedException("can't read unknown cloud event content type: " + dataContentType);
         }
-        return baos.toByteArray();
     }
+
 }

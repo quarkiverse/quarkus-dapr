@@ -14,7 +14,8 @@ import io.quarkus.runtime.annotations.Recorder;
 @Recorder
 public class DaprRuntimeRecorder {
 
-    public void subscribeToTopics(String pubSubName, String topicName, String route, Map<String, String> metadata) {
-        DaprRuntime.getInstance().addSubscribedTopic(pubSubName, topicName, route, metadata);
+    public void subscribeToTopics(String pubSubName, String topicName, String match, int priority, String route,
+            Map<String, String> metadata) {
+        DaprRuntime.getInstance().addSubscribedTopic(pubSubName, topicName, match, priority, route, metadata);
     }
 }

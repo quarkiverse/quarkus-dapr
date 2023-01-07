@@ -16,8 +16,6 @@
  */
 package io.quarkiverse.dapr.demo;
 
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -46,9 +44,8 @@ public class PubsubResource {
     @GET
     @Path("/trigger/topic1")
     public String triggerSendEvent2Topic1() {
-        String content = counter.getAndIncrement() + "-app1";
-        dapr.publishEvent("topic1", content.getBytes(StandardCharsets.UTF_8),
-                new HashMap<>());
+        int content = counter.getAndIncrement();
+        dapr.publishEvent("topic1", content);
         System.out.println("App1 succeeds to send event to topic1 with content=" + content);
 
         return "App1 succeeds to send event to topic1 with content=" + content;

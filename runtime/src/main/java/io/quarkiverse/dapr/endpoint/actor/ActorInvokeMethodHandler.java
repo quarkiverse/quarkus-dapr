@@ -29,7 +29,7 @@ public class ActorInvokeMethodHandler extends AbstractDaprActorHandler {
         String type = event.pathParam("type");
         String id = event.pathParam("id");
         String method = event.pathParam("method");
-        byte[] body = event.getBody().getBytes();
+        byte[] body = event.body().buffer().getBytes();
         event.json(ActorRuntime.getInstance().invoke(type, id, method, body).block());
     }
 }

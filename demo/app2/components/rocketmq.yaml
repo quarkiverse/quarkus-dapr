@@ -1,0 +1,18 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: rocketmq
+spec:
+  type: pubsub.rocketmq
+  version: v1
+  metadata:
+    - name: nameServer
+      value: "http://rocketmqnamesrv.ops.svc.cluster.local:9876"
+    - name: producerGroup
+      value: "GID_APP2"
+    - name: consumerGroup
+      value: "GID_APP2"
+    - name: sendTimeOutSec
+      value: 30
+    - name: retries
+      value: 3

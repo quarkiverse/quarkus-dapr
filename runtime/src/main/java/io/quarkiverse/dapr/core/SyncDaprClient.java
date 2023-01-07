@@ -1,14 +1,28 @@
 package io.quarkiverse.dapr.core;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.microprofile.config.ConfigProvider;
+import java.util.Objects;
+import java.util.Optional;
 
 import io.dapr.client.DaprClient;
-import io.dapr.client.DaprClientBuilder;
-import io.dapr.client.domain.*;
+import io.dapr.client.domain.DeleteStateRequest;
+import io.dapr.client.domain.ExecuteStateTransactionRequest;
+import io.dapr.client.domain.GetBulkSecretRequest;
+import io.dapr.client.domain.GetBulkStateRequest;
+import io.dapr.client.domain.GetSecretRequest;
+import io.dapr.client.domain.GetStateRequest;
+import io.dapr.client.domain.HttpExtension;
+import io.dapr.client.domain.InvokeBindingRequest;
+import io.dapr.client.domain.InvokeMethodRequest;
+import io.dapr.client.domain.PublishEventRequest;
+import io.dapr.client.domain.SaveStateRequest;
+import io.dapr.client.domain.State;
+import io.dapr.client.domain.StateOptions;
+import io.dapr.client.domain.TransactionalStateOperation;
 import io.dapr.utils.TypeRef;
+import io.quarkiverse.dapr.config.DaprConfig;
 
 /**
  * SyncDaprClient
@@ -18,16 +32,12 @@ import io.dapr.utils.TypeRef;
  */
 public class SyncDaprClient implements AutoCloseable {
     private final DaprClient daprClient;
+    private final DaprConfig config;
 
-    public SyncDaprClient() {
-        daprClient = new DaprClientBuilder().build();
-    }
-
-    public SyncDaprClient(DaprClient daprClient) {
+    public SyncDaprClient(DaprClient daprClient, DaprConfig config) {
         this.daprClient = daprClient;
+        this.config = config;
     }
-
-    private String defaultPubSubName = ConfigProvider.getConfig().getValue("dapr.pub-sub.name", String.class);
 
     /**
      * Waits for the sidecar, giving up after timeout.
@@ -47,7 +57,9 @@ public class SyncDaprClient implements AutoCloseable {
      * @return a Mono plan of type void.
      */
     public void publishEvent(String topicName, Object data) {
-        daprClient.publishEvent(defaultPubSubName, topicName, data).block();
+        String pubSubName = getPubsubName(null);
+        Map<String, String> end = getPubSubPublishMetadata(pubSubName, null);
+        daprClient.publishEvent(pubSubName, topicName, data, end).block();
     }
 
     /**
@@ -59,7 +71,9 @@ public class SyncDaprClient implements AutoCloseable {
      * @return a Mono plan of type void.
      */
     public void publishEvent(String topicName, Object data, Map<String, String> metadata) {
-        daprClient.publishEvent(defaultPubSubName, topicName, data, metadata).block();
+        String pubSubName = getPubsubName(null);
+        Map<String, String> end = getPubSubPublishMetadata(pubSubName, metadata);
+        daprClient.publishEvent(pubSubName, topicName, data, end).block();
     }
 
     /**
@@ -71,7 +85,9 @@ public class SyncDaprClient implements AutoCloseable {
      * @return a Mono plan of type void.
      */
     public void publishEvent(String pubsubName, String topicName, Object data) {
-        daprClient.publishEvent(pubsubName, topicName, data).block();
+        pubsubName = getPubsubName(pubsubName);
+        Map<String, String> end = getPubSubPublishMetadata(pubsubName, null);
+        daprClient.publishEvent(pubsubName, topicName, data, end).block();
     }
 
     /**
@@ -84,7 +100,9 @@ public class SyncDaprClient implements AutoCloseable {
      * @return a Mono plan of type void.
      */
     public void publishEvent(String pubsubName, String topicName, Object data, Map<String, String> metadata) {
-        daprClient.publishEvent(pubsubName, topicName, data, metadata).block();
+        pubsubName = getPubsubName(pubsubName);
+        Map<String, String> end = getPubSubPublishMetadata(pubsubName, metadata);
+        daprClient.publishEvent(pubsubName, topicName, data, end).block();
     }
 
     /**
@@ -94,6 +112,9 @@ public class SyncDaprClient implements AutoCloseable {
      * @return a Mono plan of a Dapr's void response.
      */
     void publishEvent(PublishEventRequest request) {
+        String pubsubName = getPubsubName(request.getPubsubName());
+        Map<String, String> end = getPubSubPublishMetadata(pubsubName, request.getMetadata());
+        request.setMetadata(end);
         daprClient.publishEvent(request).block();
     }
 
@@ -679,5 +700,19 @@ public class SyncDaprClient implements AutoCloseable {
     @Override
     public void close() throws Exception {
         daprClient.close();
+    }
+
+    private String getPubsubName(String pubsubName) {
+        return Optional.ofNullable(pubsubName).orElse(config.defaultPubSub);
+    }
+
+    public Map<String, String> getPubSubPublishMetadata(String pubsubName, Map<String, String> metadata) {
+        Map<String, String> pubsubDefaultPublishMetadata = Optional.ofNullable(config.pubSub.get(pubsubName))
+                .map(a -> new HashMap(a.publishMetadata))
+                .orElse(new HashMap<>());
+        if (Objects.nonNull(metadata)) {
+            pubsubDefaultPublishMetadata.putAll(metadata);
+        }
+        return pubsubDefaultPublishMetadata;
     }
 }

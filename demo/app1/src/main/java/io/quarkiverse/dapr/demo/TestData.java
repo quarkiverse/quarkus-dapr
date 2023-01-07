@@ -13,6 +13,13 @@ public class TestData {
 
     private String content;
 
+    public TestData() {
+    }
+
+    public TestData(String content) {
+        this.content = content;
+    }
+
     public String getContent() {
         return content;
     }

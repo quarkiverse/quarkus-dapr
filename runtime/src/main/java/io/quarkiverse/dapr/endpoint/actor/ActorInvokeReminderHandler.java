@@ -29,7 +29,7 @@ public class ActorInvokeReminderHandler extends AbstractDaprActorHandler {
         String type = event.pathParam("type");
         String id = event.pathParam("id");
         String reminder = event.pathParam("reminder");
-        byte[] body = event.getBody().getBytes();
+        byte[] body = event.body().buffer().getBytes();
         ActorRuntime.getInstance().invokeReminder(type, id, reminder, body).block();
     }
 }
