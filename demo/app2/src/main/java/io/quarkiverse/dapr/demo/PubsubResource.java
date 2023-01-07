@@ -16,8 +16,6 @@
  */
 package io.quarkiverse.dapr.demo;
 
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -27,6 +25,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import io.dapr.Topic;
+import io.dapr.client.domain.CloudEvent;
 import io.quarkiverse.dapr.core.SyncDaprClient;
 
 @Path("/pubsub")
@@ -45,24 +44,22 @@ public class PubsubResource {
     @POST
     @Path("/topic1")
     @Topic(name = "topic1")
-    public String eventOnTopic1(String content) {
-        System.out.println("App2 received event from topic1: content=" + content);
+    public String eventOnTopic1(CloudEvent<Integer> event) {
+        Integer data = event.getData();
+        System.out.println("App2 received event from topic1: content=" + data);
 
-        content = "content" + "-app2";
-        dapr.publishEvent("topic2", content.getBytes(StandardCharsets.UTF_8),
-                new HashMap<>());
+        String content = data + "-app2";
+        dapr.publishEvent("topic2", content);
         System.out.println("App1 sent event to topic2 with content=" + content);
 
-        content = "content" + "-app3";
-        dapr.publishEvent("topic3", content.getBytes(StandardCharsets.UTF_8),
-                new HashMap<>());
+        content = data + "-app3";
+        dapr.publishEvent("topic3", content);
         System.out.println("App1 sent event to topic3 with content=" + content);
 
-        content = "content" + "-app4";
+        content = data + "-app4";
         TestData testData = new TestData();
         testData.setContent(content);
-        dapr.publishEvent("topic4", testData,
-                new HashMap<>());
+        dapr.publishEvent("topic4", testData);
         System.out.println("App1 sent event to topic4 with object content=" + content);
 
         return "App2 received event from topic1";

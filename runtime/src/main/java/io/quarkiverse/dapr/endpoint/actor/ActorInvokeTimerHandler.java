@@ -29,7 +29,7 @@ public class ActorInvokeTimerHandler extends AbstractDaprActorHandler {
         String type = event.pathParam("type");
         String id = event.pathParam("id");
         String timer = event.pathParam("timer");
-        byte[] body = event.getBody().getBytes();
+        byte[] body = event.body().buffer().getBytes();
         event.json(ActorRuntime.getInstance().invokeTimer(type, id, timer, body).block());
     }
 }

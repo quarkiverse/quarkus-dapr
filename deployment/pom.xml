@@ -21,10 +21,6 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-grpc-deployment</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>io.quarkus</groupId>-->
-<!--            <artifactId>quarkus-jackson-deployment</artifactId>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy-reactive-jackson-deployment</artifactId>
@@ -39,6 +35,12 @@
             <artifactId>quarkus-junit5-internal</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

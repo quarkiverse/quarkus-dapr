@@ -35,20 +35,20 @@ public class DaprResource {
 
     @GET
     @Path("/1")
-    @Topic(name = "test-topic1", pubsubName = "rocketmq")
+    @Topic(name = "test-topic1")
     public String postTopic1() {
         return "Hello dapr";
     }
 
     @POST
-    @Topic(name = "test-topic2", pubsubName = "rocketmq")
+    @Topic(name = "test-topic2")
     public String postTopic2() {
         return "Hello dapr";
     }
 
     @POST
     @Path("/topic3")
-    @Topic(name = "test-topic3", pubsubName = "rocketmq")
+    @Topic(name = "test-topic3")
     public String postTopic3() {
         return "Hello dapr";
     }

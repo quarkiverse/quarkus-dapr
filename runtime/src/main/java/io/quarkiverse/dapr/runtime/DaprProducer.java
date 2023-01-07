@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.dapr.client.DaprClient;
 import io.dapr.client.DaprClientBuilder;
+import io.quarkiverse.dapr.config.DaprConfig;
 import io.quarkiverse.dapr.core.SyncDaprClient;
 import io.quarkiverse.dapr.serializer.JacksonDaprObjectSerializer;
 import io.quarkus.arc.DefaultBean;
@@ -51,11 +52,16 @@ public class DaprProducer {
     @Startup
     @Singleton
     @Unremovable
-    public SyncDaprClient syncDaprClient(DaprClient client) {
-        return new SyncDaprClient(client);
+    public SyncDaprClient syncDaprClient(DaprClient client, DaprConfig config) {
+        return new SyncDaprClient(client, config);
     }
 
     void onStop(@Observes ShutdownEvent ev, DaprClient client) {
-        client.shutdown().block();
+        try {
+            client.close();
+
+        } catch (Throwable e) {
+
+        }
     }
 }
