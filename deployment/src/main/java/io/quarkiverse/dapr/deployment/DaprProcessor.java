@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.jandex.AnnotationInstance;
@@ -65,8 +67,8 @@ class DaprProcessor {
     private static final String FEATURE = "dapr";
 
     private static final DotName DAPR_TOPIC = DotName.createSimple(Topic.class.getName());
-    private static final DotName RESTEASY_PATH = DotName.createSimple("javax.ws.rs.Path");
-    private static final DotName RESTEASY_POST = DotName.createSimple("javax.ws.rs.POST");
+    private static final DotName RESTEASY_PATH = DotName.createSimple(Path.class);
+    private static final DotName RESTEASY_POST = DotName.createSimple(POST.class);
     private static final TypeReference<HashMap<String, String>> MAP_TYPE = new TypeReference<HashMap<String, String>>() {
     };
     private static final ObjectMapper objectMapper = new ObjectMapper();
