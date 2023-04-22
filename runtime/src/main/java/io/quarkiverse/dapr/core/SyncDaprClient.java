@@ -709,7 +709,7 @@ public class SyncDaprClient implements AutoCloseable {
     public Map<String, String> getPubSubPublishMetadata(String pubsubName, Map<String, String> metadata) {
         Map<String, String> pubsubDefaultPublishMetadata = Optional.ofNullable(config.pubSub.get(pubsubName))
                 .map(a -> new HashMap(a.publishMetadata))
-                .orElse(new HashMap<>());
+                .orElse(new HashMap<>(16));
         if (Objects.nonNull(metadata)) {
             pubsubDefaultPublishMetadata.putAll(metadata);
         }
