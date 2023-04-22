@@ -69,7 +69,7 @@ class DaprProcessor {
     private static final DotName RESTEASY_POST = DotName.createSimple("jakarta.ws.rs.POST");
     private static final TypeReference<HashMap<String, String>> MAP_TYPE = new TypeReference<HashMap<String, String>>() {
     };
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -120,22 +120,25 @@ class DaprProcessor {
     void daprTopicBuildItems(BuildProducer<DaprTopicBuildItem> topicProducer, CombinedIndexBuildItem indexBuildItem,
             DaprConfig daprConfig) {
         Map<String, DaprConfig.DaprPubSubConfig> pubSubConfigMap = Optional.ofNullable(daprConfig.pubSub)
-                .orElse(new HashMap<>());
+                .orElse(new HashMap<>(16));
         for (AnnotationInstance i : indexBuildItem.getIndex().getAnnotations(DAPR_TOPIC)) {
             if (i.target().kind() == AnnotationTarget.Kind.METHOD) {
 
                 MethodInfo methodInfo = i.target().asMethod();
                 ClassInfo classInfo = methodInfo.declaringClass();
                 Optional<AnnotationInstance> methodPostOp = methodInfo.annotations().stream()
-                        .filter(annotation -> annotation.name().equals(RESTEASY_POST))
+                        .filter(annotation -> annotation.name()
+                                .equals(RESTEASY_POST))
                         .findFirst();
 
                 methodPostOp.ifPresent(mp -> {
                     Optional<AnnotationInstance> classPathOp = classInfo.annotationsMap().entrySet().stream()
-                            .filter(entry -> entry.getKey().equals(RESTEASY_PATH))
+                            .filter(entry -> entry.getKey()
+                                    .equals(RESTEASY_PATH))
                             .map(Map.Entry::getValue)
                             .flatMap(list -> list.stream())
-                            .filter(a -> a.target().kind() == AnnotationTarget.Kind.CLASS)
+                            .filter(a -> a.target()
+                                    .kind() == AnnotationTarget.Kind.CLASS)
                             .findFirst();
 
                     String methodPath = null;
@@ -151,56 +154,9 @@ class DaprProcessor {
                     }
 
                     if (classPathOp.isPresent() || Objects.nonNull(methodPath)) {
-                        String path = "";
-                        if (classPathOp.isPresent()) {
-                            path += classPathOp.get().value().asString();
-                        }
-                        if (StringUtils.isNotBlank(methodPath)) {
-                            path += methodPath;
-                        }
-                        path.replaceAll("//", "/");
-                        String pubsubName = Optional.ofNullable(topic.value("pubsubName"))
-                                .map(AnnotationValue::asString)
-                                .orElse(daprConfig.defaultPubSub);
-
-                        String topicName = topic.value("name").asString();
-
-                        String ruleMatch = Optional.ofNullable(topic.value("rule"))
-                                .map(AnnotationValue::asNested)
-                                .map(a -> a.value("match"))
-                                .map(AnnotationValue::asString)
-                                .orElse("");
-                        int rulePriority = Optional.ofNullable(topic.value("rule"))
-                                .map(AnnotationValue::asNested)
-                                .map(a -> a.value("priority"))
-                                .map(AnnotationValue::asInt)
-                                .orElse(0);
-
-                        AnnotationValue metadataValue = topic.value("metadata");
-
-                        Map<String, String> consumeMetadata = Optional.ofNullable(pubSubConfigMap.get(pubsubName))
-                                .map(a -> new HashMap(a.consumeMetadata))
-                                .orElse(new HashMap<>());
-                        Map<String, String> topicMetadata = Optional.ofNullable(metadataValue)
-                                .map(a -> {
-                                    try {
-                                        return objectMapper.readValue(a.asString(), MAP_TYPE);
-                                    } catch (JsonProcessingException e) {
-                                        log.error("dapr topic metadata to path error in class:{},topicName:{}",
-                                                classInfo.name().toString(),
-                                                topicName, e);
-                                        return null;
-                                    }
-                                })
-                                .orElse(new HashMap<>());
-                        consumeMetadata.putAll(topicMetadata);
-                        topicProducer.produce(new DaprTopicBuildItem(
-                                pubsubName,
-                                topicName,
-                                path,
-                                ruleMatch,
-                                rulePriority,
-                                consumeMetadata));
+                        DaprTopicBuildItem item = buildDaprTopicBuildItem(daprConfig, pubSubConfigMap, classInfo, classPathOp,
+                                methodPath, topic);
+                        topicProducer.produce(item);
                     }
                 });
             }
@@ -221,6 +177,65 @@ class DaprProcessor {
         }
     }
 
+    private static DaprTopicBuildItem buildDaprTopicBuildItem(DaprConfig daprConfig,
+            Map<String, DaprConfig.DaprPubSubConfig> pubSubConfigMap,
+            ClassInfo classInfo,
+            Optional<AnnotationInstance> classPathOp,
+            String methodPath,
+            AnnotationInstance topic) {
+        String path = "";
+        if (classPathOp.isPresent()) {
+            path += classPathOp.get().value().asString();
+        }
+        if (StringUtils.isNotBlank(methodPath)) {
+            path += methodPath;
+        }
+        path.replaceAll("//", "/");
+        String pubsubName = Optional.ofNullable(topic.value("pubsubName"))
+                .map(AnnotationValue::asString)
+                .orElse(daprConfig.defaultPubSub);
+
+        String topicName = topic.value("name").asString();
+
+        String ruleMatch = Optional.ofNullable(topic.value("rule"))
+                .map(AnnotationValue::asNested)
+                .map(a -> a.value("match"))
+                .map(AnnotationValue::asString)
+                .orElse("");
+        int rulePriority = Optional.ofNullable(topic.value("rule"))
+                .map(AnnotationValue::asNested)
+                .map(a -> a.value("priority"))
+                .map(AnnotationValue::asInt)
+                .orElse(0);
+
+        AnnotationValue metadataValue = topic.value("metadata");
+
+        Map<String, String> consumeMetadata = Optional.ofNullable(pubSubConfigMap.get(pubsubName))
+                .map(a -> new HashMap(a.consumeMetadata))
+                .orElse(new HashMap<>(8));
+        Map<String, String> topicMetadata = Optional.ofNullable(metadataValue)
+                .map(a -> {
+                    try {
+                        return OBJECT_MAPPER.readValue(a.asString(), MAP_TYPE);
+                    } catch (JsonProcessingException e) {
+                        log.error("dapr topic metadata to path error in class:{},topicName:{}",
+                                classInfo.name().toString(),
+                                topicName, e);
+                        return null;
+                    }
+                })
+                .orElse(new HashMap<>(8));
+        consumeMetadata.putAll(topicMetadata);
+        DaprTopicBuildItem item = new DaprTopicBuildItem(
+                pubsubName,
+                topicName,
+                path,
+                ruleMatch,
+                rulePriority,
+                consumeMetadata);
+        return item;
+    }
+
     private RouteBuildItem getDaprRouteBuildItem(NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
             AbstractDaprHandler handler) {
         return nonApplicationRootPathBuildItem.routeBuilder()
@@ -232,9 +247,13 @@ class DaprProcessor {
 
     @BuildStep
     void reflectiveClasses(BuildProducer<ReflectiveClassBuildItem> reflectiveClassBuildProducer) {
-        reflectiveClassBuildProducer.produce(new ReflectiveClassBuildItem(true, true,
-                DaprTopicSubscription.class,
-                ActorRuntimeConfig.class,
-                CloudEvent.class));
+        ReflectiveClassBuildItem buildItem = ReflectiveClassBuildItem.builder(DaprTopicSubscription.class.getName(),
+                ActorRuntimeConfig.class.getName(),
+                CloudEvent.class.getName())
+                .methods(true)
+                .fields(true)
+                .build();
+        reflectiveClassBuildProducer.produce(buildItem);
     }
+
 }
