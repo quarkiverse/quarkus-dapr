@@ -21,7 +21,7 @@ public class DaprResourceTest {
 
     @Test
     public void testTopicEndpoint() {
-        String resp = "[{\"pubsubName\":\"messagebus\",\"topic\":\"test-topic2\",\"route\":\"/dapr\",\"metadata\":{\"test\":\"aaa\"}},{\"pubsubName\":\"messagebus\",\"topic\":\"test-topic3\",\"route\":\"/dapr/topic3\",\"metadata\":{\"test\":\"aaa\"}}]";
+        String resp = "[{\"pubsubName\":\"messagebus\",\"topic\":\"topic-4\",\"route\":\"/dapr/topic4\",\"metadata\":{\"test\":\"aaa\"}},{\"pubsubName\":\"messagebus\",\"topic\":\"test-topic2\",\"route\":\"/dapr\",\"metadata\":{\"test\":\"aaa\"}},{\"pubsubName\":\"messagebus\",\"topic\":\"test-topic3\",\"route\":\"/dapr/topic3\",\"metadata\":{\"test\":\"aaa\"}}]";
         given()
                 .when().get("/dapr/subscribe")
                 .then()
