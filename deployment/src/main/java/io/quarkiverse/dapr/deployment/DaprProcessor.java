@@ -63,7 +63,6 @@ class DaprProcessor {
     private static final Logger log = LoggerFactory.getLogger(DaprProcessor.class);
 
     private static final String FEATURE = "dapr";
-
     private static final DotName DAPR_TOPIC = DotName.createSimple(Topic.class.getName());
     private static final DotName RESTEASY_PATH = DotName.createSimple("jakarta.ws.rs.Path");
     private static final DotName RESTEASY_POST = DotName.createSimple("jakarta.ws.rs.POST");
@@ -197,6 +196,7 @@ class DaprProcessor {
 
         String topicName = topic.value("name").asString();
 
+        log.info(String.format("topic name %s", topicName));
         String ruleMatch = Optional.ofNullable(topic.value("rule"))
                 .map(AnnotationValue::asNested)
                 .map(a -> a.value("match"))

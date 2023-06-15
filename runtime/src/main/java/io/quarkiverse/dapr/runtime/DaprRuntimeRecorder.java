@@ -2,6 +2,7 @@ package io.quarkiverse.dapr.runtime;
 
 import java.util.Map;
 
+import io.quarkiverse.dapr.config.ConfigUtils;
 import io.quarkiverse.dapr.core.DaprRuntime;
 import io.quarkus.runtime.annotations.Recorder;
 
@@ -16,6 +17,7 @@ public class DaprRuntimeRecorder {
 
     public void subscribeToTopics(String pubSubName, String topicName, String match, int priority, String route,
             Map<String, String> metadata) {
-        DaprRuntime.getInstance().addSubscribedTopic(pubSubName, topicName, match, priority, route, metadata);
+        String topicNameValue = ConfigUtils.getConfigValueIfNecessary(topicName, true);
+        DaprRuntime.getInstance().addSubscribedTopic(pubSubName, topicNameValue, match, priority, route, metadata);
     }
 }

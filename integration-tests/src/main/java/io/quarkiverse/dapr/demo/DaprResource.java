@@ -52,4 +52,11 @@ public class DaprResource {
     public String postTopic3() {
         return "Hello dapr";
     }
+
+    @POST
+    @Path("/topic4")
+    @Topic(name = "${topic.four}")
+    public String postTopic4() {
+        return "Hello dapr";
+    }
 }
