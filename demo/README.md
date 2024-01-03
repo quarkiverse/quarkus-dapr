@@ -31,14 +31,14 @@ cd demo
 cd app1
 quarkus build --native
 # ensure app1 binary file exists
-ls -lh target/quarkus-dapr-demo-app1-1.0.0-SNAPSHOT-runner
+ls -lh target/quarkus-dapr-demo-app1-1.0.5-SNAPSHOT-runner
 
 # build native binary for app2
 cd ..
 cd app2
 quarkus build --native
 # ensure app2 binary file exists
-ls -lh target/quarkus-dapr-demo-app2-1.0.0-SNAPSHOT-runner
+ls -lh target/quarkus-dapr-demo-app2-1.0.5-SNAPSHOT-runner
 cd ..
 ```
 
@@ -76,7 +76,7 @@ dapr run --app-port 8081 --app-id app1 --app-protocol http --dapr-http-port 3501
 
 # start app1 in another terminal
 cd quarkus-dapr/demo/app1
-./target/quarkus-dapr-demo-app1-1.0.0-SNAPSHOT-runner
+./target/quarkus-dapr-demo-app1-1.0.5-SNAPSHOT-runner
 ```
 
 Check the log to see if app1 and dapr runtime start successfully. 
@@ -95,7 +95,7 @@ dapr run --app-port 8082 --app-id app2 --app-protocol http --dapr-http-port 3502
 
 # start app2 in another terminal
 cd quarkus-dapr/demo/app2
-./target/quarkus-dapr-demo-app2-1.0.0-SNAPSHOT-runner
+./target/quarkus-dapr-demo-app2-1.0.5-SNAPSHOT-runner
 ```
 
 Check the log to see if app2 and dapr runtime start successfully.
