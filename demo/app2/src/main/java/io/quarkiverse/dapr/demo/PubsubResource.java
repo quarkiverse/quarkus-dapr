@@ -50,17 +50,17 @@ public class PubsubResource {
 
         String content = data + "-app2";
         dapr.publishEvent("topic2", content);
-        System.out.println("App1 sent event to topic2 with content=" + content);
+        System.out.println("App2 sent event to topic2 with content=" + content);
 
         content = data + "-app3";
         dapr.publishEvent("topic3", content);
-        System.out.println("App1 sent event to topic3 with content=" + content);
+        System.out.println("App2 sent event to topic3 with content=" + content);
 
         content = data + "-app4";
         TestData testData = new TestData();
         testData.setContent(content);
         dapr.publishEvent("topic4", testData);
-        System.out.println("App1 sent event to topic4 with object content=" + content);
+        System.out.println("App2 sent event to topic4 with object content=" + content);
 
         return "App2 received event from topic1";
     }
