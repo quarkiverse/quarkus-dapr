@@ -34,6 +34,15 @@
         "code",
         "maintenance"
       ]
+    },
+    {
+      "login": "yugoccp",
+      "name": "Yugo Sakamoto",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1724114?v=4",
+      "profile": "https://theleaderdev.com/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -41,5 +50,7 @@
   "projectOwner": "quarkiverse",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitType": "docs",
+  "commitConvention": "angular"
 }
