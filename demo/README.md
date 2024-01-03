@@ -31,14 +31,14 @@ cd demo
 cd app1
 quarkus build --native
 # ensure app1 binary file exists
-ls -lh target/quarkus-dapr-demo-app1-1.0.0-SNAPSHOT-runner
+ls -lh target/quarkus-dapr-demo-app1-1.0.5-SNAPSHOT-runner
 
 # build native binary for app2
 cd ..
 cd app2
 quarkus build --native
 # ensure app2 binary file exists
-ls -lh target/quarkus-dapr-demo-app2-1.0.0-SNAPSHOT-runner
+ls -lh target/quarkus-dapr-demo-app2-1.0.5-SNAPSHOT-runner
 cd ..
 ```
 
