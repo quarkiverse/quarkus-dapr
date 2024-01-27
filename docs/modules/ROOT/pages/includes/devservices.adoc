@@ -1,0 +1,70 @@
+Quarkus Dapr Extension provides a DevService to enhance your experience with Quarkus and Dapr.
+
+== Enabling / Disabling Dev Services for Dapr
+
+Dev Services for Dapr are disabled by default unless:
+
+- `quarkus.devservices.enabled` and `quarkus.dapr.devservices.enabled` are set to `true`
+
+== Shared Dapr
+
+In some scenarios, when you are running the application locally, you need to share the Dapr Sidecar between applications. Dev Services for Dapr implements a _service discovery_ mechanism for your multiple Quarkus applications running in _dev_ mode to share a single Dapr Sidecar.
+
+[NOTE]
+Dev Services for Dapr starts the container with the `quarkus-dev-service-dapr` label, which is used to identify the container.
+
+If you need multiple (shared) Dapr Sidecars, you can configure the `quarkus.dapr.devservices.service-name` attribute and indicate the sidecar name. It looks for a container with the same value or starts a new one if none can be found. The default service name is `dapr`.
+
+Sharing is enabled by default in dev mode but disabled in test mode. You can disable sharing with `quarkus.dapr.devservices.shared=false`.
+
+== Setting the Port
+
+By default, Dev Services for Dapr uses the default port for GRPC and HTTP protocols. The default value for `quarkus.dapr.devservices.grpc-port` is `50001`, and for `quarkus.dapr.devservices.http-port` is `3500`.
+
+It is necessary when you want to have more than one Dapr Dev Service running on different ports.
+
+[NOTE]
+The properties `quarkus.dapr.devservices.grpc-port` and `quarkus.dapr.deviservices.http-port` only have an effect if the property `quarkus.dapr.devservices.shared` is set to `true`; otherwise, Dapr Dev Services use the default Dapr ports.
+
+[IMPORTANT]
+Do not forget to change the `quarkus.dapr.devservices.service-name` because Dapr Dev Services look for containers with the label and will reuse the container if the label is the same.
+
+== Adding Dapr Components
+
+By default, Dapr DevServices create a Dapr container containing in-memory Pub/Sub and in-memory State Store building blocks.
+
+If you want to add a custom Dapr component, you need to add it to the `src/main/resources/components` folder.
+
+Example of Pub/Sub using Redis.
+
+[source,yaml]
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub
+spec:
+  type: pubsub.redis
+  version: v1
+  metadata:
+    - name: redisHost
+      value: 172.17.0.2:6379
+    - name: redisPassword
+      value: ""
+
+Example of State Store using Redis:
+
+[source,yaml]
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore
+spec:
+  type: state.redis
+  version: v1
+  metadata:
+    - name: keyPrefix
+      value: name
+    - name: redisHost
+      value: 172.17.0.2:6379
+    - name: redisPassword
+      value: ""

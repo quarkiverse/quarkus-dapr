@@ -40,7 +40,10 @@
             <artifactId>protobuf-java-util</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-devservices-deployment</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
