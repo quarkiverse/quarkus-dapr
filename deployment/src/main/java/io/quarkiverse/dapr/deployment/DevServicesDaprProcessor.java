@@ -165,7 +165,7 @@ public class DevServicesDaprProcessor {
                     configurePortBindings(getHttpPort.get(), DAPRD_GRPC_PORT)));
 
             List<com.github.dockerjava.api.model.Network> networks = DockerClientFactory.instance().client().listNetworksCmd()
-                    .withNameFilter("dapr").exec();
+                    .withNameFilter(FEATURE).exec();
             if (networks.isEmpty()) {
                 Network.builder()
                         .createNetworkCmdModifier(cmd -> cmd.withName(FEATURE))
