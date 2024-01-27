@@ -15,7 +15,7 @@ Dev Services for Dapr starts the container with the `quarkus-dev-service-dapr` l
 
 If you need multiple (shared) Dapr Sidecars, you can configure the `quarkus.dapr.devservices.service-name` attribute and indicate the sidecar name. It looks for a container with the same value or starts a new one if none can be found. The default service name is `dapr`.
 
-Sharing is enabled by default in dev mode but disabled in test mode. You can disable sharing with `quarkus.dapr.devservices.shared=false`.
+Sharing is enabled by default in dev mode. You can disable sharing with `quarkus.dapr.devservices.shared=false`.
 
 == Setting the Port
 
