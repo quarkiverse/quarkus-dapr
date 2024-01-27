@@ -1,21 +1,5 @@
 package io.quarkiverse.dapr.deployment;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testcontainers.Testcontainers;
-import org.yaml.snakeyaml.Yaml;
-
 import io.diagrid.dapr.DaprContainer;
 import io.diagrid.dapr.DaprContainer.Component;
 import io.diagrid.dapr.DaprContainer.MetadataEntry;
@@ -28,12 +12,26 @@ import io.quarkus.deployment.builditem.DockerStatusBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.console.StartupLogCompressor;
-import io.quarkus.deployment.dev.devservices.GlobalDevServicesConfig;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.devservices.common.ContainerAddress;
 import io.quarkus.devservices.common.ContainerLocator;
 import io.quarkus.devservices.common.ContainerShutdownCloseable;
 import io.quarkus.runtime.util.ClassPathUtils;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
+import org.testcontainers.Testcontainers;
+import org.testcontainers.containers.Network;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class DevServicesDaprProcessor {
 
@@ -53,7 +51,7 @@ public class DevServicesDaprProcessor {
     static volatile DaprDevServiceBuildTimeConfig cfg;
     static volatile boolean first = true;
 
-    @BuildStep(onlyIfNot = { IsNormal.class }, onlyIf = { GlobalDevServicesConfig.Enabled.class })
+    @BuildStep(onlyIfNot = { IsNormal.class })
     DevServicesResultBuildItem devServices(
             DockerStatusBuildItem dockerStatusBuildItem,
             DaprDevServiceBuildTimeConfig config,
@@ -165,6 +163,31 @@ public class DevServicesDaprProcessor {
             dapr.setPortBindings(List.of(
                     configurePortBindings(getGrpcPort.get(), DAPRD_HTTP_PORT),
                     configurePortBindings(getHttpPort.get(), DAPRD_GRPC_PORT)));
+
+            List<com.github.dockerjava.api.model.Network> networks = DockerClientFactory.instance().client().listNetworksCmd()
+                    .withNameFilter("dapr").exec();
+            if (networks.isEmpty()) {
+                Network.builder()
+                        .createNetworkCmdModifier(cmd -> cmd.withName(FEATURE))
+                        .build().getId();
+            }
+
+            dapr.withNetwork(new Network() {
+                @Override
+                public String getId() {
+                    return FEATURE;
+                }
+
+                @Override
+                public void close() {
+
+                }
+
+                @Override
+                public Statement apply(Statement base, Description description) {
+                    return null;
+                }
+            });
 
             dapr.start();
 

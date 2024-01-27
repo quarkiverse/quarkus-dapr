@@ -4,22 +4,31 @@ Quarkus Dapr Extension provides a DevService to enhance your experience with Qua
 
 Dev Services for Dapr are disabled by default unless:
 
-- `quarkus.devservices.enabled` and `quarkus.dapr.devservices.enabled` are set to `true`
+- `quarkus.dapr.devservices.enabled` is set to `true`
 
 == Shared Dapr
 
-In some scenarios, when you are running the application locally, you need to share the Dapr Sidecar between applications. Dev Services for Dapr implements a _service discovery_ mechanism for your multiple Quarkus applications running in _dev_ mode to share a single Dapr Sidecar.
+In some scenarios, when you are running the application locally, you need to share the Dapr Sidecar between applications.
+Dev Services for Dapr implements a _service discovery_ mechanism for your multiple Quarkus applications running in _dev_ mode to share a single Dapr Sidecar.
 
 [NOTE]
 Dev Services for Dapr starts the container with the `quarkus-dev-service-dapr` label, which is used to identify the container.
 
-If you need multiple (shared) Dapr Sidecars, you can configure the `quarkus.dapr.devservices.service-name` attribute and indicate the sidecar name. It looks for a container with the same value or starts a new one if none can be found. The default service name is `dapr`.
+If you need multiple (shared) Dapr Sidecars, you can configure the `quarkus.dapr.devservices.service-name` attribute and indicate the sidecar name.
+It looks for a container with the same value or starts a new one if none can be found.
+The default service name is `dapr`.
 
+<<<<<<< HEAD
 Sharing is enabled by default in dev mode. You can disable sharing with `quarkus.dapr.devservices.shared=false`.
+=======
+Sharing is enabled by default in dev mode but disabled in test mode.
+You can disable sharing with `quarkus.dapr.devservices.shared=false`.
+>>>>>>> 37ea8ea (Add dapr Docker network by default)
 
 == Setting the Port
 
-By default, Dev Services for Dapr uses the default port for GRPC and HTTP protocols. The default value for `quarkus.dapr.devservices.grpc-port` is `50001`, and for `quarkus.dapr.devservices.http-port` is `3500`.
+By default, Dev Services for Dapr uses the default port for GRPC and HTTP protocols.
+The default value for `quarkus.dapr.devservices.grpc-port` is `50001`, and for `quarkus.dapr.devservices.http-port` is `3500`.
 
 It is necessary when you want to have more than one Dapr Dev Service running on different ports.
 
@@ -68,3 +77,8 @@ spec:
       value: 172.17.0.2:6379
     - name: redisPassword
       value: ""
+
+== Network
+
+By default, Dev Services for Dapr utilize a network named `dapr`.
+Dev Services search for a Docker Network named `dapr`; if one does not exist, Dev Services create it.
