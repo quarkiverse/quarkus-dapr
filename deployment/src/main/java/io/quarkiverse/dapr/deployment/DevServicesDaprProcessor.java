@@ -161,7 +161,7 @@ public class DevServicesDaprProcessor {
 
             final Supplier<Integer> getGrpcPort = () -> !config.shared ? config.grpcPort : DAPRD_GRPC_PORT;
             final Supplier<Integer> getHttpPort = () -> !config.shared ? config.httpPort : DAPRD_HTTP_PORT;
-                // This is necessary when the user wants to use Dev Services shared
+            // This is necessary when the user wants to use Dev Services shared
             dapr.setPortBindings(List.of(
                     configurePortBindings(getGrpcPort.get(), DAPRD_HTTP_PORT),
                     configurePortBindings(getHttpPort.get(), DAPRD_GRPC_PORT)));
