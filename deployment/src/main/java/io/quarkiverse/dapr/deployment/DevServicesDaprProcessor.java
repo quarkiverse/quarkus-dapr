@@ -44,7 +44,7 @@ public class DevServicesDaprProcessor {
     static volatile DaprDevServiceBuildTimeConfig cfg;
     static volatile boolean first = true;
 
-    @BuildStep(onlyIfNot = {IsNormal.class})
+    @BuildStep(onlyIfNot = { IsNormal.class })
     DevServicesResultBuildItem devServices(
             DockerStatusBuildItem dockerStatusBuildItem,
             DaprDevServiceBuildTimeConfig config,
