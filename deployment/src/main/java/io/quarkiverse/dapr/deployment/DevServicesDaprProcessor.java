@@ -13,10 +13,9 @@ import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
 import io.quarkus.deployment.console.StartupLogCompressor;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
-import io.quarkus.devservices.common.ContainerAddress;
-import io.quarkus.devservices.common.ContainerLocator;
 import io.quarkus.devservices.common.ContainerShutdownCloseable;
 import io.quarkus.runtime.util.ClassPathUtils;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class DevServicesDaprProcessor {
@@ -40,18 +38,13 @@ public class DevServicesDaprProcessor {
     private static final String DAPR_GRPC_PORT_PROPERTY = "dapr.grpc.port";
     private static final String DAPR_HTTP_PORT_PROPERTY = "dapr.http.port";
     private static final int DAPR_DEFAULT_PORT = 8080;
-    private static final int DAPRD_HTTP_PORT = 3500;
-    private static final int DAPRD_GRPC_PORT = 50001;
     private static final String COMPONENTS_DIR = "components";
-    private static final String DEV_SERVICE_LABEL = "quarkus-dev-service-dapr";
-    private static final ContainerLocator daprContainerLocator = new ContainerLocator(DEV_SERVICE_LABEL,
-            DAPRD_HTTP_PORT);
 
     static volatile DevServicesResultBuildItem.RunningDevService devService;
     static volatile DaprDevServiceBuildTimeConfig cfg;
     static volatile boolean first = true;
 
-    @BuildStep(onlyIfNot = { IsNormal.class })
+    @BuildStep(onlyIfNot = {IsNormal.class})
     DevServicesResultBuildItem devServices(
             DockerStatusBuildItem dockerStatusBuildItem,
             DaprDevServiceBuildTimeConfig config,
@@ -74,7 +67,7 @@ public class DevServicesDaprProcessor {
                 consoleInstalledBuildItem, loggingSetupBuildItem);
         try {
 
-            devService = startDapr(dockerStatusBuildItem, config, launchMode);
+            devService = startDapr(dockerStatusBuildItem, config);
 
             if (devService == null) {
                 compressor.closeAndDumpCaptured();
@@ -111,14 +104,9 @@ public class DevServicesDaprProcessor {
         return devService.toBuildItem();
     }
 
-    private String configurePortBindings(int containerPort, int bindPort) {
-        return String.format("0.0.0.0:%d:%d", containerPort, bindPort);
-    }
-
     private DevServicesResultBuildItem.RunningDevService startDapr(
             DockerStatusBuildItem dockerStatusBuildItem,
-            DaprDevServiceBuildTimeConfig config,
-            LaunchModeBuildItem launchMode) {
+            DaprDevServiceBuildTimeConfig config) {
 
         if (!config.enabled.orElse(false)) {
             LOGGER.debug("Not starting Dev Services for Dapr, as it has been disabled in the config.");
@@ -130,85 +118,65 @@ public class DevServicesDaprProcessor {
             return null;
         }
 
-        final Optional<ContainerAddress> maybeContainerAddress = daprContainerLocator.locateContainer(
-                config.serviceName,
-                config.shared,
-                launchMode.getLaunchMode());
+        DaprContainer dapr = new DaprContainer("daprio/daprd:1.12.2")
+                .withAppName("local-dapr-app")
+                .withAppPort(DAPR_DEFAULT_PORT)
+                .withDaprLogLevel(DaprContainer.DaprLogLevel.debug)
+                .withAppChannelAddress("host.testcontainers.internal");
 
-        final Supplier<DevServicesResultBuildItem.RunningDevService> defaultDaprContainer = () -> {
-            DaprContainer dapr = new DaprContainer("daprio/daprd:1.12.2")
-                    .withAppName("local-dapr-app")
-                    .withAppPort(DAPR_DEFAULT_PORT)
-                    .withDaprLogLevel(DaprContainer.DaprLogLevel.debug)
-                    .withAppChannelAddress("host.testcontainers.internal");
-
-            if (config.serviceName != null) {
-                dapr.withLabel(DEV_SERVICE_LABEL, config.serviceName);
+        Yaml yaml = new Yaml();
+        try {
+            List<Component> components = tryGenerateComponentsFromResources(yaml);
+            for (Component component : components) {
+                dapr = dapr.withComponent(component);
             }
+        } catch (IOException e) {
+            LOGGER.warn("Was not possible to add custom components to Dapr Sidecar", e);
+        }
 
-            Yaml yaml = new Yaml();
+        createDaprNetwork();
 
-            try {
-                List<Component> components = tryGenerateComponentsFromResources(yaml);
-                for (Component component : components) {
-                    dapr = dapr.withComponent(component);
-                }
-            } catch (IOException e) {
-                LOGGER.warn("Was not possible to add custom components to Dapr Sidecar", e);
-            }
+        dapr.withNetwork(getNetwork());
 
-            final Supplier<Integer> getGrpcPort = () -> !config.shared ? config.grpcPort : DAPRD_GRPC_PORT;
-            final Supplier<Integer> getHttpPort = () -> !config.shared ? config.httpPort : DAPRD_HTTP_PORT;
-            // This is necessary when the user wants to use Dev Services shared
-            dapr.setPortBindings(List.of(
-                    configurePortBindings(getGrpcPort.get(), DAPRD_HTTP_PORT),
-                    configurePortBindings(getHttpPort.get(), DAPRD_GRPC_PORT)));
+        dapr.start();
 
-            List<com.github.dockerjava.api.model.Network> networks = DockerClientFactory.instance().client().listNetworksCmd()
-                    .withNameFilter(FEATURE).exec();
-            if (networks.isEmpty()) {
-                Network.builder()
-                        .createNetworkCmdModifier(cmd -> cmd.withName(FEATURE))
-                        .build().getId();
-            }
+        Testcontainers.exposeHostPorts(applicationHttpPort());
+        Testcontainers.exposeHostPorts(applicatioGrpcPort());
+        System.setProperty(DAPR_GRPC_PORT_PROPERTY, Integer.toString(dapr.getGRPCPort()));
+        System.setProperty(DAPR_HTTP_PORT_PROPERTY, Integer.toString(dapr.getHTTPPort()));
 
-            dapr.withNetwork(new Network() {
-                @Override
-                public String getId() {
-                    return FEATURE;
-                }
+        return new DevServicesResultBuildItem.RunningDevService(FEATURE,
+                dapr.getContainerId(),
+                new ContainerShutdownCloseable(dapr, "Dapr"),
+                Map.of());
 
-                @Override
-                public void close() {
+    }
 
-                }
+    private int getIntegerValueOrElse(String property, final Integer orElse) {
+        return ConfigProvider.getConfig().getOptionalValue(property, Integer.class)
+                .orElse(orElse);
+    }
 
-                @Override
-                public Statement apply(Statement base, Description description) {
-                    return null;
-                }
-            });
+    private int applicationHttpPort() {
+        return getIntegerValueOrElse("quarkus.http.port", 8080);
+    }
 
-            dapr.start();
+    private int applicatioGrpcPort() {
+        return getIntegerValueOrElse("quarkus.grpc.server.port", 9000);
+    }
 
-            Testcontainers.exposeHostPorts(DAPR_DEFAULT_PORT);
-            System.setProperty(DAPR_GRPC_PORT_PROPERTY, Integer.toString(dapr.getGRPCPort()));
-            System.setProperty(DAPR_HTTP_PORT_PROPERTY, Integer.toString(dapr.getHTTPPort()));
-
-            return new DevServicesResultBuildItem.RunningDevService(FEATURE,
-                    dapr.getContainerId(),
-                    new ContainerShutdownCloseable(dapr, "Dapr"),
-                    Map.of());
-        };
-
-        return maybeContainerAddress
-                .map(containerAddress -> new DevServicesResultBuildItem.RunningDevService(
-                        FEATURE,
-                        containerAddress.getId(),
-                        null,
-                        Map.of()))
-                .orElseGet(defaultDaprContainer);
-
+    private static void createDaprNetwork() {
+        List<com.github.dockerjava.api.model.Network> networks = DockerClientFactory.instance()
+                .client()
+                .listNetworksCmd()
+                .withNameFilter(FEATURE)
+                .exec();
+        if (networks.isEmpty()) {
+            Network.builder()
+                    .createNetworkCmdModifier(cmd -> cmd.withName(FEATURE))
+                    .build()
+                    .getId();
+        }
     }
 
     private static List<Component> tryGenerateComponentsFromResources(Yaml yaml) throws IOException {
@@ -259,6 +227,25 @@ public class DevServicesDaprProcessor {
                             metadataItemValue));
         }
         return Optional.of(new Component(name, type, metadataEntries));
+    }
+
+    private static Network getNetwork() {
+        return new Network() {
+            @Override
+            public String getId() {
+                return FEATURE;
+            }
+
+            @Override
+            public void close() {
+
+            }
+
+            @Override
+            public Statement apply(Statement base, Description description) {
+                return null;
+            }
+        };
     }
 
     private void shutdownDapr() {
