@@ -19,4 +19,11 @@ public class DaprDevServiceBuildTimeConfig {
      */
     @ConfigItem
     public Optional<Boolean> enabled = Optional.empty();
+
+    /**
+     * The Dapr container image to use.
+     * <p>
+     */
+    @ConfigItem(defaultValue = "daprio/daprd:latest")
+    public String daprdImage;
 }

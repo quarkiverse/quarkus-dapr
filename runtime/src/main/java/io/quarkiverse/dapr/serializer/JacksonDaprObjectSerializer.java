@@ -48,9 +48,6 @@ public class JacksonDaprObjectSerializer implements DaprObjectSerializer {
 
     @Override
     public <T> T deserialize(byte[] data, TypeRef<T> type) throws IOException {
-        if (data.length == 0) {
-            return null;
-        }
         return this.objectMapper.readValue(data, this.objectMapper.constructType(type.getType()));
     }
 

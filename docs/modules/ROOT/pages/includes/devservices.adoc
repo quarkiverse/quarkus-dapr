@@ -6,6 +6,10 @@ Dev Services for Dapr are disabled by default unless:
 
 - `quarkus.dapr.devservices.enabled` is set to `true`
 
+== Setting Dapr image
+
+Dev Services for Dapr uses the latest `daprio/daprd` image (`diagrid/daprd:latest`). You can change this image using the `quarkus.dapr.devservices.image-name` property.
+
 == Adding Dapr Components
 
 By default, Dapr DevServices create a Dapr container containing in-memory Pub/Sub and in-memory State Store building blocks.

@@ -1,5 +1,21 @@
 package io.quarkiverse.dapr.deployment;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Stream;
+
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
+import org.testcontainers.Testcontainers;
+import org.testcontainers.containers.Network;
+import org.yaml.snakeyaml.Yaml;
+
 import io.diagrid.dapr.DaprContainer;
 import io.diagrid.dapr.DaprContainer.Component;
 import io.diagrid.dapr.DaprContainer.MetadataEntry;
@@ -15,21 +31,6 @@ import io.quarkus.deployment.console.StartupLogCompressor;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.devservices.common.ContainerShutdownCloseable;
 import io.quarkus.runtime.util.ClassPathUtils;
-import org.eclipse.microprofile.config.ConfigProvider;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testcontainers.DockerClientFactory;
-import org.testcontainers.Testcontainers;
-import org.testcontainers.containers.Network;
-import org.yaml.snakeyaml.Yaml;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Stream;
 
 public class DevServicesDaprProcessor {
 
@@ -118,7 +119,7 @@ public class DevServicesDaprProcessor {
             return null;
         }
 
-        DaprContainer dapr = new DaprContainer("daprio/daprd:1.12.2")
+        DaprContainer dapr = new DaprContainer(config.daprdImage)
                 .withAppName("local-dapr-app")
                 .withAppPort(DAPR_DEFAULT_PORT)
                 .withDaprLogLevel(DaprContainer.DaprLogLevel.debug)
@@ -138,10 +139,10 @@ public class DevServicesDaprProcessor {
 
         dapr.withNetwork(getNetwork());
 
+        Testcontainers.exposeHostPorts(applicationHttpPort(), applicationGrpcPort());
+
         dapr.start();
 
-        Testcontainers.exposeHostPorts(applicationHttpPort());
-        Testcontainers.exposeHostPorts(applicatioGrpcPort());
         System.setProperty(DAPR_GRPC_PORT_PROPERTY, Integer.toString(dapr.getGRPCPort()));
         System.setProperty(DAPR_HTTP_PORT_PROPERTY, Integer.toString(dapr.getHTTPPort()));
 
@@ -161,7 +162,7 @@ public class DevServicesDaprProcessor {
         return getIntegerValueOrElse("quarkus.http.port", 8080);
     }
 
-    private int applicatioGrpcPort() {
+    private int applicationGrpcPort() {
         return getIntegerValueOrElse("quarkus.grpc.server.port", 9000);
     }
 
