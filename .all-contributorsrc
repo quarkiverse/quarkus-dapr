@@ -43,6 +43,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "mcruzdev",
+      "name": "Matheus Cruz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/56329339?v=4",
+      "profile": "https://github.com/mcruzdev",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
