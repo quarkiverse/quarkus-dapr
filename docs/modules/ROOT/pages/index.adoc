@@ -72,4 +72,10 @@ For more details and hands-on experiences, please reference to our link:https://
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 
+[[devservices]]
+== Dapr DevServices
+include::includes/devservices.adoc[leveloffset=+1, opts=optional]
+
 include::config.adoc[leveloffset=+1, opts=optional]
+
+
