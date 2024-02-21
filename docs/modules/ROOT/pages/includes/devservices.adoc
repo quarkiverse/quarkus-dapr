@@ -28,7 +28,7 @@ spec:
   version: v1
   metadata:
     - name: redisHost
-      value: 172.17.0.2:6379
+      value: localhost:6379
     - name: redisPassword
       value: ""
 
@@ -46,7 +46,7 @@ spec:
     - name: keyPrefix
       value: name
     - name: redisHost
-      value: 172.17.0.2:6379
+      value: localhost:6379
     - name: redisPassword
       value: ""
 
