@@ -7,7 +7,7 @@
         <version>999-SNAPSHOT</version>
     </parent>
     <properties>
-        <testcontainers-dapr.version>0.10.12</testcontainers-dapr.version>
+        <testcontainers-dapr.version>0.10.14</testcontainers-dapr.version>
     </properties>
     <artifactId>quarkus-dapr</artifactId>
     <name>Quarkus - Dapr - Runtime</name>
