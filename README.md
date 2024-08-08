@@ -39,7 +39,7 @@ For more information about Dapr, please go https://dapr.io/.
 
 Quarkus Dapr is a Quarkus extension to integrate with Dapr.
 
-Please, see the [latest released documentation](https://docs.quarkiverse.io/quarkus-dapr/dev/index.html) if you are looking for instructions
+Please, see the [latest released documentation](https://docs.quarkiverse.io/quarkus-dapr/dev/index.html) if you are looking for instructions.
 
 Quarkus Dapr Extension enables Java developers to create ultra lightweight Java native applications for Function 
 Computing and FaaS scenes, which is also particularly suitable for running as serverless. 
