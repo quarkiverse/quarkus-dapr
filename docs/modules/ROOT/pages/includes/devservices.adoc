@@ -14,6 +14,9 @@ Dev Services for Dapr uses the latest `daprio/daprd` image (`diagrid/daprd:lates
 
 By default, Dapr DevServices create a Dapr container containing in-memory Pub/Sub and in-memory State Store building blocks.
 
+> [NOTE]
+The link:https://docs.dapr.io/concepts/components-concept[component] name for link:https://docs.dapr.io/reference/components-reference/supported-pubsub/setup-inmemory[Pub/Sub in-memory] is called `pubsub` and for link:https://docs.dapr.io/reference/components-reference/supported-state-stores/setup-inmemory/[State Store in-memory] is called `kvstore`.
+
 If you want to add a custom Dapr component, you need to add it to the `src/main/resources/components` folder.
 
 Example of Pub/Sub using Redis.
