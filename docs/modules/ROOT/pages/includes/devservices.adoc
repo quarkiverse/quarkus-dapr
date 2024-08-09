@@ -10,15 +10,83 @@ Dev Services for Dapr are disabled by default unless:
 
 Dev Services for Dapr uses the latest `daprio/daprd` image (`diagrid/daprd:latest`). You can change this image using the `quarkus.dapr.devservices.image-name` property.
 
+== Using In-Memory Dapr Components
+
+> [NOTE]
+The link:https://docs.dapr.io/concepts/components-concept[component] name for link:https://docs.dapr.io/reference/components-reference/supported-pubsub/setup-inmemory[Pub/Sub in-memory] is called `pubsub` and for link:https://docs.dapr.io/reference/components-reference/supported-state-stores/setup-inmemory/[State Store in-memory] is called `kvstore`.
+
+Example of code using Pub/Sub and State Store in-memory:
+
+[source,java]
+.DaprResource.java
+----
+package io.dapr.docs;
+
+import io.dapr.Topic;
+import io.dapr.client.domain.CloudEvent;
+import io.dapr.client.domain.State;
+import io.quarkiverse.dapr.core.SyncDaprClient;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
+import java.util.Map;
+import java.util.UUID;
+
+@Path("/dapr")
+public class DaprResource {
+
+    @Inject
+    SyncDaprClient client;
+
+    @POST
+    @Path("/state")
+    public Response saveState() {
+        client.saveState("kvstore", "identity", UUID.randomUUID().toString()); // <1>
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/state")
+    public Response getState() {
+        State<String> state = client.getState("kvstore", "identity", String.class);
+        return Response.ok(Map.of("identity", state.getValue())).build();
+    }
+
+    @POST
+    @Path("/pub")
+    public void pub() {
+        client.publishEvent("pubsub", "topicName", "Hello from Quarkus!"); // <2>
+    }
+
+    @POST
+    @Topic(name = "topicName") // <3>
+    @Path("/sub") // <4>
+    public void sub(CloudEvent<String> event) {
+        System.out.println("Received event: " + event.getData());
+    }
+}
+----
+
+<1> `kvstore` is the name of the in-memory State Store component created by DevServices, and `identity` is the key used to store the value.
+<2> `pubsub` is the name of the in-memory Pub/Sub component created by DevServices, and `topicName` is the name of the topic used to publish the message (`Hello from Quarkus!`).
+<3> `topicName` is the name of the topic used to subscribe to the message, you need to add the `@io.dapr.Topic` annotation to map the topic.
+If you want to add a custom Dapr component, you need to add it to the `src/main/resources/components` folder.
+<4> The value `sub` can be any value, it is used behind the scenes to map the endpoint to the topic.
+
+> [IMPORTANT]
+> The default `quarkus.dapr.default-pub-sub` value is `redis`, so you need to change to `pubsub` if you want to use the in-memory Pub/Sub component.
+
 == Adding Dapr Components
 
-By default, Dapr DevServices create a Dapr container containing in-memory Pub/Sub and in-memory State Store building blocks.
-
-If you want to add a custom Dapr component, you need to add it to the `src/main/resources/components` folder.
+By default, Dapr DevServices create a Dapr container containing in-memory Pub/Sub and in-memory State Store building blocks. If you want to use a non-in-memory Dapr component, you need to add it to the `src/main/resources/components` folder.
 
 Example of Pub/Sub using Redis.
 
 [source,yaml]
+.src/main/resources/components/redis-pubsub.yaml
+----
 apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
@@ -31,10 +99,13 @@ spec:
       value: localhost:6379
     - name: redisPassword
       value: ""
+----
 
 Example of State Store using Redis:
 
 [source,yaml]
+.src/main/resources/components/redis-statestore.yaml
+----
 apiVersion: dapr.io/v1alpha1
 kind: Component
 metadata:
@@ -49,7 +120,7 @@ spec:
       value: localhost:6379
     - name: redisPassword
       value: ""
-
+----
 == Network
 
 By default, Dev Services for Dapr utilize a network named `dapr`.

@@ -1,0 +1,82 @@
+
+:summaryTableId: quarkus-dapr
+[.configuration-legend]
+icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
+[.configuration-reference.searchable, cols="80,.^10,.^10"]
+|===
+
+h|[[quarkus-dapr_configuration]]link:#quarkus-dapr_configuration[Configuration property]
+
+h|Type
+h|Default
+
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-default-pub-sub]]`link:#quarkus-dapr_quarkus-dapr-default-pub-sub[quarkus.dapr.default-pub-sub]`
+
+
+[.description]
+--
+default pub sub config
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_DAPR_DEFAULT_PUB_SUB+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_DAPR_DEFAULT_PUB_SUB+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`redis`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-type]]`link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-type[quarkus.dapr.pub-sub."pub-sub".type]`
+
+
+[.description]
+--
+pub sub type
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_DAPR_PUB_SUB__PUB_SUB__TYPE+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_DAPR_PUB_SUB__PUB_SUB__TYPE+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`redis`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-publish-metadata-publish-metadata]]`link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-publish-metadata-publish-metadata[quarkus.dapr.pub-sub."pub-sub".publish-metadata."publish-metadata"]`
+
+
+[.description]
+--
+publish pub sub default metadata
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_DAPR_PUB_SUB__PUB_SUB__PUBLISH_METADATA__PUBLISH_METADATA_+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_DAPR_PUB_SUB__PUB_SUB__PUBLISH_METADATA__PUBLISH_METADATA_+++`
+endif::add-copy-button-to-env-var[]
+--|link:https://docs.oracle.com/javase/8/docs/api/java/lang/String.html[String]
+ 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-consume-metadata-consume-metadata]]`link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-consume-metadata-consume-metadata[quarkus.dapr.pub-sub."pub-sub".consume-metadata."consume-metadata"]`
+
+
+[.description]
+--
+consume pub sub default metadata
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_DAPR_PUB_SUB__PUB_SUB__CONSUME_METADATA__CONSUME_METADATA_+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_DAPR_PUB_SUB__PUB_SUB__CONSUME_METADATA__CONSUME_METADATA_+++`
+endif::add-copy-button-to-env-var[]
+--|link:https://docs.oracle.com/javase/8/docs/api/java/lang/String.html[String]
+ 
+|
+
+|===
