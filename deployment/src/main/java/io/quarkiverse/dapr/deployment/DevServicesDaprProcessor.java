@@ -3,10 +3,13 @@ package io.quarkiverse.dapr.deployment;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.microprofile.config.ConfigProvider;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
@@ -63,12 +66,13 @@ public class DevServicesDaprProcessor {
             cfg = null;
         }
 
+        boolean launchModeTest = launchMode.isTest();
         StartupLogCompressor compressor = new StartupLogCompressor(
-                (launchMode.isTest() ? "(test) " : "") + "Dev Services for Dapr starting:",
+                (launchModeTest ? "(test) " : "") + "Dev Services for Dapr starting:",
                 consoleInstalledBuildItem, loggingSetupBuildItem);
         try {
 
-            devService = startDapr(dockerStatusBuildItem, config);
+            devService = startDapr(dockerStatusBuildItem, config, launchModeTest);
 
             if (devService == null) {
                 compressor.closeAndDumpCaptured();
@@ -107,21 +111,21 @@ public class DevServicesDaprProcessor {
 
     private DevServicesResultBuildItem.RunningDevService startDapr(
             DockerStatusBuildItem dockerStatusBuildItem,
-            DaprDevServiceBuildTimeConfig config) {
+            DaprDevServiceBuildTimeConfig config, boolean launchModeTest) {
 
         if (!config.enabled.orElse(false)) {
             LOGGER.debug("Not starting Dev Services for Dapr, as it has been disabled in the config.");
             return null;
         }
 
-        if (!dockerStatusBuildItem.isDockerAvailable()) {
+        if (!dockerStatusBuildItem.isContainerRuntimeAvailable()) {
             LOGGER.warn("Docker isn't working.");
             return null;
         }
 
         DaprContainer dapr = new DaprContainer(config.daprdImage)
                 .withAppName("local-dapr-app")
-                .withAppPort(DAPR_DEFAULT_PORT)
+                .withAppPort(QuarkusPorts.http(launchModeTest))
                 .withDaprLogLevel(DaprContainer.DaprLogLevel.debug)
                 .withAppChannelAddress("host.testcontainers.internal");
 
@@ -139,7 +143,8 @@ public class DevServicesDaprProcessor {
 
         dapr.withNetwork(getNetwork());
 
-        Testcontainers.exposeHostPorts(applicationHttpPort(), applicationGrpcPort());
+        Testcontainers.exposeHostPorts(QuarkusPorts.http(launchModeTest),
+                QuarkusPorts.grpc(launchModeTest));
 
         dapr.start();
 
@@ -151,19 +156,6 @@ public class DevServicesDaprProcessor {
                 new ContainerShutdownCloseable(dapr, "Dapr"),
                 Map.of());
 
-    }
-
-    private int getIntegerValueOrElse(String property, final Integer orElse) {
-        return ConfigProvider.getConfig().getOptionalValue(property, Integer.class)
-                .orElse(orElse);
-    }
-
-    private int applicationHttpPort() {
-        return getIntegerValueOrElse("quarkus.http.port", 8080);
-    }
-
-    private int applicationGrpcPort() {
-        return getIntegerValueOrElse("quarkus.grpc.server.port", 9000);
     }
 
     private static void createDaprNetwork() {
