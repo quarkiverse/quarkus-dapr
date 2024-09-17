@@ -1,5 +1,6 @@
 package io.quarkiverse.dapr.deployment;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -135,7 +136,7 @@ class DaprProcessor {
                             .filter(entry -> entry.getKey()
                                     .equals(RESTEASY_PATH))
                             .map(Map.Entry::getValue)
-                            .flatMap(list -> list.stream())
+                            .flatMap(Collection::stream)
                             .filter(a -> a.target()
                                     .kind() == AnnotationTarget.Kind.CLASS)
                             .findFirst();
@@ -189,7 +190,7 @@ class DaprProcessor {
         if (StringUtils.isNotBlank(methodPath)) {
             path += methodPath;
         }
-        path.replaceAll("//", "/");
+        path = path.replaceAll("//", "/");
         String pubsubName = Optional.ofNullable(topic.value("pubsubName"))
                 .map(AnnotationValue::asString)
                 .orElse(daprConfig.defaultPubSub);
