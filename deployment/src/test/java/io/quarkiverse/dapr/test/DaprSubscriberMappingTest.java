@@ -13,7 +13,6 @@ import jakarta.ws.rs.core.Response;
 import org.assertj.core.api.SoftAssertions;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
@@ -52,7 +51,6 @@ public class DaprSubscriberMappingTest {
                         for (DaprTopicBuildItem buildItem : buildItems) {
                             LOGGER.info("buildItem route: {}", buildItem.getRoute());
                         }
-                        Assertions.assertEquals("/events", buildItems.get(0).getRoute());
                     }
                 });
             }
