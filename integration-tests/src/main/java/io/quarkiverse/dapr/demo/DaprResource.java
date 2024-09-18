@@ -16,15 +16,23 @@
  */
 package io.quarkiverse.dapr.demo;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 
+import io.dapr.Rule;
 import io.dapr.Topic;
 
 @Path("/dapr")
 @ApplicationScoped
+@RegisterForReflection(classNames = {
+        "io.quarkiverse.dapr.core.DaprTopicRule",
+        "io.quarkiverse.dapr.core.DaprTopicRoutes",
+        "io.quarkiverse.dapr.core.DaprTopicSubscription",
+        "io.quarkiverse.dapr.resteasy.CloudEventReader"
+})
 public class DaprResource {
     // add some rest methods here
 
@@ -57,6 +65,20 @@ public class DaprResource {
     @Path("/topic4")
     @Topic(name = "${topic.four}")
     public String postTopic4() {
+        return "Hello dapr";
+    }
+
+    @POST
+    @Path("/topic5")
+    @Topic(name = "${topic.five}", pubsubName = "${pubsub}")
+    public String postTopic5() {
+        return "Hello dapr";
+    }
+
+    @POST
+    @Path("/topic6")
+    @Topic(name = "${topic.six}", pubsubName = "${pubsub.six}", rule = @Rule(match = "${match.rule}", priority = 0))
+    public String postTopic6() {
         return "Hello dapr";
     }
 }

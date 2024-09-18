@@ -67,6 +67,17 @@ To subscribe events for your message broker, adding some annotations on your met
 public String eventOnTopic2(String content) {......}
 ----
 
+In the attributes `name`, `pubsubName`, and `match` of the `@Topic` annotation, it is possible to set a config property to be loaded at runtime.
+
+[source,java]
+----
+@POST
+@Path("/topic6")
+@Topic(name = "${topic6}", pubsubName = "${pubsub.topic6}", rule = @Rule(match = "${match.rule6}", priority = 1))
+public String eventOnTopic6(String content) {......}
+----
+
+
 For more details and hands-on experiences, please reference to our link:https://github.com/quarkiverse/quarkus-dapr/blob/main/demo/README.md[Demo].
 
 [[extension-configuration-reference]]

@@ -1,10 +1,10 @@
 package io.quarkiverse.dapr.test;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.quarkiverse.dapr.core.DaprRuntime;
-import io.quarkiverse.dapr.core.DaprTopicSubscription;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -20,13 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import io.dapr.Topic;
 import io.dapr.client.domain.CloudEvent;
+import io.quarkiverse.dapr.core.DaprRuntime;
+import io.quarkiverse.dapr.core.DaprTopicSubscription;
 import io.quarkiverse.dapr.deployment.DaprTopicBuildItem;
 import io.quarkus.builder.BuildChainBuilder;
 import io.quarkus.builder.BuildContext;
 import io.quarkus.builder.BuildStep;
 import io.quarkus.test.QuarkusUnitTest;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class DaprSubscriberMappingTest {
 
