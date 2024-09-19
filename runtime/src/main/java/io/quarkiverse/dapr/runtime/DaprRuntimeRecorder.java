@@ -18,6 +18,9 @@ public class DaprRuntimeRecorder {
     public void subscribeToTopics(String pubSubName, String topicName, String match, int priority, String route,
             Map<String, String> metadata) {
         String topicNameValue = ConfigUtils.getConfigValueIfNecessary(topicName, true);
-        DaprRuntime.getInstance().addSubscribedTopic(pubSubName, topicNameValue, match, priority, route, metadata);
+        String pubSubNameValue = ConfigUtils.getConfigValueIfNecessary(pubSubName, true);
+        String matchValue = ConfigUtils.getConfigValueIfNecessary(match, true);
+        DaprRuntime.getInstance().addSubscribedTopic(pubSubNameValue, topicNameValue, (matchValue != null ? matchValue : ""),
+                priority, route, metadata);
     }
 }
