@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.quarkiverse.dapr</groupId>
         <artifactId>quarkus-dapr-demo-parent</artifactId>
-        <version>2.1.0</version>
+        <version>999-SNAPSHOT</version>
     </parent>
     <artifactId>quarkus-dapr-demo-app1</artifactId>
     <name>Quarkus - Dapr - Demo - App1</name>
