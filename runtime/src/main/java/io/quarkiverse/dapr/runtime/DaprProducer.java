@@ -16,7 +16,6 @@ import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.Startup;
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
 /**
  * DaprProducer
