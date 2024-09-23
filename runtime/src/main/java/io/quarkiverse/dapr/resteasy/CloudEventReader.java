@@ -67,8 +67,8 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
             case MediaType.APPLICATION_OCTET_STREAM:
                 byte[] binaryData = jsonNode.get("data_base64").binaryValue();
                 String pubsubname = jsonNode.get("pubsubname").asText();
-                String rawPayload = Optional.ofNullable(DAPR_CONFIG.pubSub.get(pubsubname))
-                        .map(a -> a.consumeMetadata)
+                String rawPayload = Optional.ofNullable(DAPR_CONFIG.pubSub().get(pubsubname))
+                        .map(a -> a.consumeMetadata())
                         .map(a -> a.get("rawPayload"))
                         .orElse("");
                 if (Objects.equals("true", rawPayload)) {

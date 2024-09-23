@@ -113,7 +113,7 @@ public class DevServicesDaprProcessor {
             DockerStatusBuildItem dockerStatusBuildItem,
             DaprDevServiceBuildTimeConfig config, boolean launchModeTest) {
 
-        if (!config.enabled.orElse(false)) {
+        if (!config.enabled().orElse(false)) {
             LOGGER.debug("Not starting Dev Services for Dapr, as it has been disabled in the config.");
             return null;
         }
@@ -123,7 +123,7 @@ public class DevServicesDaprProcessor {
             return null;
         }
 
-        DaprContainer dapr = new DaprContainer(config.daprdImage)
+        DaprContainer dapr = new DaprContainer(config.daprdImage())
                 .withAppName("local-dapr-app")
                 .withAppPort(QuarkusPorts.http(launchModeTest))
                 .withDaprLogLevel(DaprContainer.DaprLogLevel.debug)
