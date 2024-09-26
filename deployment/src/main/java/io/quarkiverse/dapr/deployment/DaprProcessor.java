@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import io.quarkiverse.dapr.core.DaprTopicRoutes;
+import io.quarkiverse.dapr.core.DaprTopicRule;
 import jakarta.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -165,7 +167,8 @@ class DaprProcessor {
 
     @Record(ExecutionTime.RUNTIME_INIT)
     @BuildStep
-    void addTopic(DaprRuntimeRecorder daprRuntimeRecorder, List<DaprTopicBuildItem> daprTopicBuildItems) {
+    void addTopic(BuildProducer<ReflectiveClassBuildItem> reflectiveClasses, DaprRuntimeRecorder daprRuntimeRecorder,
+            List<DaprTopicBuildItem> daprTopicBuildItems) {
         for (DaprTopicBuildItem item : daprTopicBuildItems) {
             daprRuntimeRecorder.subscribeToTopics(
                     item.getPubSubName(),
@@ -250,7 +253,7 @@ class DaprProcessor {
     void reflectiveClasses(BuildProducer<ReflectiveClassBuildItem> reflectiveClassBuildProducer) {
         ReflectiveClassBuildItem buildItem = ReflectiveClassBuildItem.builder(DaprTopicSubscription.class.getName(),
                 ActorRuntimeConfig.class.getName(),
-                CloudEvent.class.getName())
+                CloudEvent.class.getName(), DaprTopicRule.class.getName(), DaprTopicRoutes.class.getName())
                 .methods(true)
                 .fields(true)
                 .build();

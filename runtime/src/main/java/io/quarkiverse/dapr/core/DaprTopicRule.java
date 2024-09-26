@@ -15,7 +15,7 @@ package io.quarkiverse.dapr.core;
 
 import java.util.Objects;
 
-class DaprTopicRule {
+public class DaprTopicRule {
     private final String match;
     private final String path;
 

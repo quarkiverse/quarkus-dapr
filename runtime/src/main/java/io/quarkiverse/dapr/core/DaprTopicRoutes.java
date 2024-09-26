@@ -17,7 +17,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-class DaprTopicRoutes {
+public class DaprTopicRoutes {
     private final List<DaprTopicRule> rules;
     @JsonProperty("default")
     private final String defaultRoute;

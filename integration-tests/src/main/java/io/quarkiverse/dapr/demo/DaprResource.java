@@ -16,7 +16,6 @@
  */
 package io.quarkiverse.dapr.demo;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -26,13 +25,6 @@ import io.dapr.Topic;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @Path("/dapr")
-@ApplicationScoped
-@RegisterForReflection(classNames = {
-        "io.quarkiverse.dapr.core.DaprTopicRule",
-        "io.quarkiverse.dapr.core.DaprTopicRoutes",
-        "io.quarkiverse.dapr.core.DaprTopicSubscription",
-        "io.quarkiverse.dapr.resteasy.CloudEventReader"
-})
 public class DaprResource {
     // add some rest methods here
 
