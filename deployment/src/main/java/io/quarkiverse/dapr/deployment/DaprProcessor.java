@@ -121,7 +121,7 @@ class DaprProcessor {
     @BuildStep
     void daprTopicBuildItems(BuildProducer<DaprTopicBuildItem> topicProducer, CombinedIndexBuildItem indexBuildItem,
             DaprConfig daprConfig) {
-        Map<String, DaprConfig.DaprPubSubConfig> pubSubConfigMap = Optional.ofNullable(daprConfig.pubSub)
+        Map<String, DaprConfig.DaprPubSubConfig> pubSubConfigMap = Optional.ofNullable(daprConfig.pubSub())
                 .orElse(new HashMap<>(16));
         for (AnnotationInstance i : indexBuildItem.getIndex().getAnnotations(DAPR_TOPIC)) {
             if (i.target().kind() == AnnotationTarget.Kind.METHOD) {
@@ -196,7 +196,7 @@ class DaprProcessor {
         path = path.replaceAll("//", "/");
         String pubsubName = Optional.ofNullable(topic.value("pubsubName"))
                 .map(AnnotationValue::asString)
-                .orElse(daprConfig.defaultPubSub);
+                .orElse(daprConfig.defaultPubSub());
 
         String topicName = topic.value("name").asString();
 
@@ -215,7 +215,7 @@ class DaprProcessor {
         AnnotationValue metadataValue = topic.value("metadata");
 
         Map<String, String> consumeMetadata = Optional.ofNullable(pubSubConfigMap.get(pubsubName))
-                .map(a -> new HashMap(a.consumeMetadata))
+                .map(a -> new HashMap(a.consumeMetadata()))
                 .orElse(new HashMap<>(8));
         Map<String, String> topicMetadata = Optional.ofNullable(metadataValue)
                 .map(a -> {

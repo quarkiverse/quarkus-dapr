@@ -22,6 +22,7 @@ import jakarta.ws.rs.Path;
 
 import io.dapr.Rule;
 import io.dapr.Topic;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @Path("/dapr")
 public class DaprResource {

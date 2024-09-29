@@ -1,12 +1,12 @@
 package io.quarkiverse.dapr.config;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import io.quarkus.runtime.annotations.ConfigGroup;
-import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
+import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithDefault;
 
 /**
  * DaprConfig
@@ -14,41 +14,39 @@ import io.quarkus.runtime.annotations.ConfigRoot;
  * @author nayan
  * @date 2022/8/11 13:44
  */
-@ConfigRoot(name = "dapr", phase = ConfigPhase.BUILD_AND_RUN_TIME_FIXED)
-public class DaprConfig {
+@ConfigRoot(phase = ConfigPhase.BUILD_AND_RUN_TIME_FIXED)
+@ConfigMapping(prefix = "quarkus.dapr")
+public interface DaprConfig {
 
     /**
      * default pub sub config
      */
-    @ConfigItem(defaultValue = "redis")
-    public String defaultPubSub;
+    @WithDefault("redis")
+    String defaultPubSub();
 
     /**
      * pub sub config
      */
-    @ConfigItem
-    public Map<String, DaprPubSubConfig> pubSub = new HashMap<>();
+    Map<String, DaprPubSubConfig> pubSub();
 
     @ConfigGroup
-    public static class DaprPubSubConfig {
+    public interface DaprPubSubConfig {
 
         /**
          * pub sub type
          */
-        @ConfigItem(defaultValue = "redis")
-        public String type;
+        @WithDefault("redis")
+        String type();
 
         /**
          * publish pub sub default metadata
          */
-        @ConfigItem
-        public Map<String, String> publishMetadata = new HashMap<>();
+        Map<String, String> publishMetadata();
 
         /**
          * consume pub sub default metadata
          */
-        @ConfigItem
-        public Map<String, String> consumeMetadata = new HashMap<>();
+        Map<String, String> consumeMetadata();
 
     }
 

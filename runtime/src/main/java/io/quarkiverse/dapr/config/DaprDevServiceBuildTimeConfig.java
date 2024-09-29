@@ -2,12 +2,14 @@ package io.quarkiverse.dapr.config;
 
 import java.util.Optional;
 
-import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
+import io.smallrye.config.ConfigMapping;
+import io.smallrye.config.WithDefault;
 
-@ConfigRoot(name = "dapr.devservices", phase = ConfigPhase.BUILD_TIME)
-public class DaprDevServiceBuildTimeConfig {
+@ConfigMapping(prefix = "quarkus.dapr.devservices")
+@ConfigRoot(phase = ConfigPhase.BUILD_TIME)
+public interface DaprDevServiceBuildTimeConfig {
 
     /**
      * Whether this Dev Service should start with the application in dev mode or
@@ -17,13 +19,12 @@ public class DaprDevServiceBuildTimeConfig {
      *
      * @asciidoclet
      */
-    @ConfigItem
-    public Optional<Boolean> enabled = Optional.empty();
+    Optional<Boolean> enabled();
 
     /**
      * The Dapr container image to use.
      * <p>
      */
-    @ConfigItem(defaultValue = "daprio/daprd:latest")
-    public String daprdImage;
+    @WithDefault("daprio/daprd:latest")
+    String daprdImage();
 }
