@@ -23,6 +23,7 @@
         <quarkus.version>2.16.12.Final</quarkus.version>
         <dapr.version>1.7.1</dapr.version>
         <okhttp.version>4.10.0</okhttp.version>
+        <version.formatter.plugin>2.24.0</version.formatter.plugin>
     </properties>
     <dependencyManagement>
         <dependencies>
