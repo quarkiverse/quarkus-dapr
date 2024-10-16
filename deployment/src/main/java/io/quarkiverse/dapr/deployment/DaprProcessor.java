@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.quarkiverse.dapr.core.DaprTopicRoutes;
-import io.quarkiverse.dapr.core.DaprTopicRule;
 import jakarta.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +28,8 @@ import io.dapr.Topic;
 import io.dapr.actors.runtime.ActorRuntimeConfig;
 import io.dapr.client.domain.CloudEvent;
 import io.quarkiverse.dapr.config.DaprConfig;
+import io.quarkiverse.dapr.core.DaprTopicRoutes;
+import io.quarkiverse.dapr.core.DaprTopicRule;
 import io.quarkiverse.dapr.core.DaprTopicSubscription;
 import io.quarkiverse.dapr.endpoint.actor.ActorDeactivateHandler;
 import io.quarkiverse.dapr.endpoint.actor.ActorInvokeMethodHandler;
