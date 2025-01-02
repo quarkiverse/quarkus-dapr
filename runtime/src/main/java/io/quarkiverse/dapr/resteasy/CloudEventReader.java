@@ -35,9 +35,18 @@ import io.quarkiverse.dapr.config.DaprConfig;
 @Produces(CloudEvent.CONTENT_TYPE)
 public class CloudEventReader implements MessageBodyReader<CloudEvent> {
 
-    private static final ObjectMapper OBJECT_MAPPER = CDI.current().select(ObjectMapper.class).get();
-    private static final DaprConfig DAPR_CONFIG = CDI.current().select(DaprConfig.class).get();
+    private static ObjectMapper OBJECT_MAPPER;
+    private static DaprConfig DAPR_CONFIG;
     private static final Map<Type, JavaType> TYPE_CACHE = new ConcurrentHashMap<>();
+
+    public CloudEventReader() {
+        if (OBJECT_MAPPER == null) {
+            OBJECT_MAPPER = CDI.current().select(ObjectMapper.class).get();
+        }
+        if (DAPR_CONFIG == null) {
+            DAPR_CONFIG = CDI.current().select(DaprConfig.class).get();
+        }
+    }
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
