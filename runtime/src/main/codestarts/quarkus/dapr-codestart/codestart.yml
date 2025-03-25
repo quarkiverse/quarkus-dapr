@@ -1,0 +1,8 @@
+name: dapr-codestart
+ref: dapr
+type: code
+tags: extension-codestart
+metadata:
+  title: Dapr Extension Codestart
+  description: This codestart generates a portable, event driven dapr for Quarkus.
+  related-guide-section: https://docs.quarkiverse.io/quarkus-dapr/dev/index.html
