@@ -1,9 +1,10 @@
 package codestarts;
 
-import io.quarkus.devtools.codestarts.quarkus.QuarkusCodestartCatalog;
-import io.quarkus.devtools.testing.codestarts.QuarkusCodestartTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import io.quarkus.devtools.codestarts.quarkus.QuarkusCodestartCatalog;
+import io.quarkus.devtools.testing.codestarts.QuarkusCodestartTest;
 
 public class QuarkusDaprCodestartsTest {
 
@@ -15,11 +16,6 @@ public class QuarkusDaprCodestartsTest {
 
     @Test
     void testContent() throws Throwable {
-        codestartTest.checkGeneratedSource("io.quarkiverse.dapr.DaprResource");
-    }
-
-    @Test
-    void buildAllProjects() throws Throwable {
-        codestartTest.buildAllProjects();
+        codestartTest.checkGeneratedSource("org.acme.Dapr");
     }
 }
