@@ -18,4 +18,9 @@ public class QuarkusDaprCodestartsTest {
     void testContent() throws Throwable {
         codestartTest.checkGeneratedSource("org.acme.Dapr");
     }
+
+    @Test
+    void buildAllProjects() throws Throwable {
+        codestartTest.buildAllProjects();
+    }
 }
