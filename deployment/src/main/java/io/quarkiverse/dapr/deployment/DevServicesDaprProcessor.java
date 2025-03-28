@@ -19,9 +19,10 @@ import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.Network;
 import org.yaml.snakeyaml.Yaml;
 
-import io.diagrid.dapr.DaprContainer;
-import io.diagrid.dapr.DaprContainer.Component;
-import io.diagrid.dapr.DaprContainer.MetadataEntry;
+import io.dapr.testcontainers.Component;
+import io.dapr.testcontainers.DaprContainer;
+import io.dapr.testcontainers.DaprLogLevel;
+import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.config.DaprDevServiceBuildTimeConfig;
 import io.quarkus.deployment.IsNormal;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -126,7 +127,7 @@ public class DevServicesDaprProcessor {
         DaprContainer dapr = new DaprContainer(config.daprdImage())
                 .withAppName("local-dapr-app")
                 .withAppPort(QuarkusPorts.http(launchModeTest))
-                .withDaprLogLevel(DaprContainer.DaprLogLevel.debug)
+                .withDaprLogLevel(DaprLogLevel.DEBUG)
                 .withAppChannelAddress("host.testcontainers.internal");
 
         Yaml yaml = new Yaml();
@@ -148,8 +149,8 @@ public class DevServicesDaprProcessor {
 
         dapr.start();
 
-        System.setProperty(DAPR_GRPC_PORT_PROPERTY, Integer.toString(dapr.getGRPCPort()));
-        System.setProperty(DAPR_HTTP_PORT_PROPERTY, Integer.toString(dapr.getHTTPPort()));
+        System.setProperty(DAPR_GRPC_PORT_PROPERTY, Integer.toString(dapr.getGrpcPort()));
+        System.setProperty(DAPR_HTTP_PORT_PROPERTY, Integer.toString(dapr.getHttpPort()));
 
         return new DevServicesResultBuildItem.RunningDevService(FEATURE,
                 dapr.getContainerId(),
@@ -203,13 +204,15 @@ public class DevServicesDaprProcessor {
         Map<String, Object> map = yaml.load(componentAsString);
 
         Map<String, Object> spec = (Map<String, Object>) map.get("spec");
+        String version = (String) spec.get("version");
+
         String type = (String) spec.get("type");
         Map<String, Object> metadata = (Map<String, Object>) map
                 .get("metadata");
         String name = (String) metadata.get("name");
         List<Map<String, Object>> specMetadata = (List<Map<String, Object>>) spec
                 .getOrDefault("metadata", Collections.emptyMap());
-        ArrayList<MetadataEntry> metadataEntries = new ArrayList<>();
+        List<MetadataEntry> metadataEntries = new ArrayList<>();
 
         for (Map<String, Object> specMetadataItem : specMetadata) {
             String metadataItemName = (String) specMetadataItem.get("name");
@@ -219,7 +222,7 @@ public class DevServicesDaprProcessor {
                     .add(new MetadataEntry(metadataItemName,
                             metadataItemValue));
         }
-        return Optional.of(new Component(name, type, metadataEntries));
+        return Optional.of(new Component(name, type, version, metadataEntries));
     }
 
     private static Network getNetwork() {
