@@ -6,9 +6,6 @@
         <artifactId>quarkus-dapr-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <properties>
-        <testcontainers-dapr.version>0.10.14</testcontainers-dapr.version>
-    </properties>
     <artifactId>quarkus-dapr</artifactId>
     <name>Quarkus - Dapr - Runtime</name>
     <dependencies>
@@ -41,11 +38,6 @@
         <dependency>
             <groupId>io.dapr</groupId>
             <artifactId>dapr-sdk-actors</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.diagrid.dapr</groupId>
-            <artifactId>testcontainers-dapr</artifactId>
-            <version>${testcontainers-dapr.version}</version>
         </dependency>
     </dependencies>
     <build>

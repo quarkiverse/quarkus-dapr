@@ -50,6 +50,11 @@
             <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.dapr</groupId>
+            <artifactId>testcontainers-dapr</artifactId>
+            <version>0.14.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
