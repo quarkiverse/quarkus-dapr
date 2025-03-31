@@ -1,5 +1,6 @@
 name: Dapr
-description: Dapr SDK
+description: Dapr for Quarkus
+artifact: ${project.groupId}:${project.artifactId}:${project.version}
 metadata:
   keywords:
     - dapr
@@ -9,3 +10,8 @@ metadata:
   categories:
     - "miscellaneous"
   status: "preview"
+  codestart:
+    name: "quarkus-dapr"
+    languages:
+      - "java"
+    artifact: "io.quarkiverse.dapr:quarkus-dapr:codestarts:jar:${project.version}"
