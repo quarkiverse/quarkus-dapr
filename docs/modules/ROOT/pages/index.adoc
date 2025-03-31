@@ -87,6 +87,6 @@ For more details and hands-on experiences, please reference to our link:https://
 == Dapr DevServices
 include::includes/devservices.adoc[leveloffset=+1, opts=optional]
 
-include::config.adoc[leveloffset=+1, opts=optional]
+include::includes/quarkus-dapr.adoc[leveloffset=+1, opts=optional]
 
 
