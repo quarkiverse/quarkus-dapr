@@ -19,6 +19,7 @@ public interface DaprDevServiceBuildTimeConfig {
      *
      * @asciidoclet
      */
+    @WithDefault("true")
     Optional<Boolean> enabled();
 
     /**
