@@ -1,0 +1,5 @@
+quarkus:
+  dapr:
+    devservices:
+      enabled: true
+    default-pub-sub: pubsub
