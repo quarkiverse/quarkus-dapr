@@ -41,6 +41,7 @@ public class ReactiveDaprHandlerBean {
     }
 
     public void handle(RoutingContext event) {
+        log.info("processor keys: {}", processors.keySet());
         Bundle<DaprMessage<?>> bundle = processors.get(key(event));
         if (bundle != null) {
             MultiEmitter<? super DaprMessage<?>> emitter = bundle.getEmitter();
@@ -51,7 +52,9 @@ public class ReactiveDaprHandlerBean {
     }
 
     private String key(RoutingContext event) {
-        return event.currentRoute().getPath();
+        String path = event.currentRoute().getPath();
+        log.info("key from RoutingContext is {}", path);
+        return path;
     }
 
     private void onUnexpectedError(RoutingContext event, Throwable error, String message) {
@@ -62,11 +65,17 @@ public class ReactiveDaprHandlerBean {
     }
 
     private void handleRequest(RoutingContext event, MultiEmitter<? super DaprMessage<?>> emitter) {
+        log.info("handling request: {}", event.currentRoute().getPath());
         if (emitter == null) {
             onUnexpectedError(event, null, "No consumer subscribed for messages sent to Reactive Messaging Dapr");
         } else {
             try {
-                emitter.emit(new DaprMessage<>(event.getBody()));
+                emitter.emit(new DaprMessage<>(event.getBody(), () -> {
+                    if (!event.response().ended()) {
+                        event.response().setStatusCode(202).end();
+                    }
+                },
+                        error -> onUnexpectedError(event, error, "Failed to process message.")));
             } catch (Exception any) {
                 onUnexpectedError(event, any, "Emitting message failed");
             }
@@ -80,7 +89,7 @@ public class ReactiveDaprHandlerBean {
         bundle.setProcessor(processor);
         Bundle<DaprMessage<?>> previousProcessor = processors.put(key(daprConfig), bundle);
         if (previousProcessor != null) {
-            throw new IllegalStateException("Duplicate incoming streams defined for " + description(daprConfig));
+            throw new IllegalStateException("incoming config are duplicated " + description(daprConfig));
         }
     }
 
@@ -91,12 +100,12 @@ public class ReactiveDaprHandlerBean {
     private String key(final DaprConnectorIncomingConfiguration incomingConfig) {
         String topic = incomingConfig.getTopic();
         String pubsubName = incomingConfig.getPubsubName();
-        return String.format("%s:%s", topic, pubsubName);
+        return String.format("/%s/%s", pubsubName, topic);
     }
 
     private String key(final DaprConfig daprConfig) {
         String pubsubName = daprConfig.pubsubName();
         String topic = daprConfig.topic();
-        return String.format("%s:%s", pubsubName, topic);
+        return String.format("/%s/%s", pubsubName, topic);
     }
 }

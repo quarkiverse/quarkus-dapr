@@ -55,7 +55,7 @@ public class ConfigReader {
             if (connectorName != null) {
                 String pubsubName = getConfigProperty(IN_KEY, connectorName, "pubsubName", String.class);
                 String topic = getConfigProperty(IN_KEY, connectorName, "topic", String.class);
-                daprConfigs.add(new DaprConfig(topic, pubsubName));
+                daprConfigs.add(new DaprConfig(pubsubName, topic));
             }
         }
         return daprConfigs;

@@ -7,6 +7,7 @@
         <groupId>io.quarkiverse.dapr</groupId>
         <artifactId>quarkus-reactive-messaging-dapr-parent</artifactId>
         <version>999-SNAPSHOT</version>
+        <relativePath>./pom.xml</relativePath>
     </parent>
     <artifactId>quarkus-reactive-messaging-dapr-deployment</artifactId>
     <name>Quarkus Reactive Messaging Dapr - Deployment</name>
