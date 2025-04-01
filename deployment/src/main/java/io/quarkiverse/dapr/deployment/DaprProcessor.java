@@ -230,14 +230,13 @@ class DaprProcessor {
                 })
                 .orElse(new HashMap<>(8));
         consumeMetadata.putAll(topicMetadata);
-        DaprTopicBuildItem item = new DaprTopicBuildItem(
+        return new DaprTopicBuildItem(
                 pubsubName,
                 topicName,
                 path,
                 ruleMatch,
                 rulePriority,
                 consumeMetadata);
-        return item;
     }
 
     private RouteBuildItem getDaprRouteBuildItem(NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
