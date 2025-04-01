@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>io.quarkiverse.dapr</groupId>
-        <artifactId>quarkus-dapr-parent</artifactId>
+        <artifactId>quarkus-reactive-messaging-dapr-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
-    <artifactId>quarkus-dapr</artifactId>
-    <name>Quarkus - Dapr - Runtime</name>
+    <artifactId>quarkus-reactive-messaging-dapr</artifactId>
+    <name>Quarkus Reactive Messaging Dapr - Runtime</name>
+
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -15,33 +18,26 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-vertx-http</artifactId>
+            <artifactId>quarkus-messaging</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-grpc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-rest-jackson</artifactId>
+            <groupId>io.smallrye.reactive</groupId>
+            <artifactId>smallrye-connector-attribute-processor</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.dapr</groupId>
             <artifactId>dapr-sdk</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>grpc-netty-shaded</artifactId>
-                    <groupId>io.grpc</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.dapr</groupId>
-            <artifactId>dapr-sdk-actors</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-reactive-routes</artifactId>
         </dependency>
+
     </dependencies>
+
     <build>
-                <plugins>
+        <plugins>
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-extension-maven-plugin</artifactId>
@@ -53,7 +49,8 @@
                             <goal>extension-descriptor</goal>
                         </goals>
                         <configuration>
-                            <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
+                            <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}
+                            </deployment>
                         </configuration>
                     </execution>
                 </executions>
@@ -81,38 +78,6 @@
                                     <version>${quarkus.version}</version>
                                 </path>
                             </annotationProcessorPaths>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-              <groupId>org.jboss.jandex</groupId>
-              <artifactId>jandex-maven-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>make-index</id>
-                  <goals>
-                    <goal>jandex</goal>
-                  </goals>
-                </execution>
-              </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-codestart-jar</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classesDirectory>${project.basedir}/src/main</classesDirectory>
-                            <includes>
-                                <include>codestarts/**</include>
-                            </includes>
-                            <classifier>codestarts</classifier>
-                            <skipIfEmpty>true</skipIfEmpty>
                         </configuration>
                     </execution>
                 </executions>
