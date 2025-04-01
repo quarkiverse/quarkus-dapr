@@ -29,7 +29,7 @@ Environment variable: `+++QUARKUS_DAPR_DEVSERVICES_ENABLED+++`
 endif::add-copy-button-to-env-var[]
 --
 |boolean
-|
+|`true`
 
 a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-devservices-daprd-image]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-devservices-daprd-image[`quarkus.dapr.devservices.daprd-image`]##
 ifdef::add-copy-button-to-config-props[]
