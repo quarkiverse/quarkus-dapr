@@ -40,6 +40,7 @@ import io.quarkus.reactive.messaging.dapr.config.ConfigReader;
 import io.quarkus.reactive.messaging.dapr.runtime.ReactiveDaprRecorder;
 import io.quarkus.vertx.http.deployment.BodyHandlerBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
+import io.quarkus.vertx.http.deployment.devmode.NotFoundPageDisplayableEndpointBuildItem;
 import io.smallrye.mutiny.Multi;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -73,6 +74,14 @@ public class ReactiveMessagingDaprProcessor {
     }
 
     @BuildStep
+    void produceNotFoundPages(BuildProducer<NotFoundPageDisplayableEndpointBuildItem> pages) {
+        List<DaprConfig> configs = ConfigReader.readIncomingHttpConfigs();
+        configs.stream().map(DaprConfig::path).distinct().forEach(s -> {
+            pages.produce(new NotFoundPageDisplayableEndpointBuildItem(s, "Dapr PubSub Subscription"));
+        });
+    }
+
+    @BuildStep
     @Consume(CombinedIndexBuildItem.class)
     @Record(ExecutionTime.RUNTIME_INIT)
     void generateRoutes(BuildProducer<RouteBuildItem> routes, ReactiveDaprRecorder recorder,
@@ -82,12 +91,11 @@ public class ReactiveMessagingDaprProcessor {
         if (!daprConfigs.isEmpty()) {
             Handler<RoutingContext> httpHandler = recorder.createHttpHandler();
             daprConfigs.stream().map(DaprConfig::path).distinct().forEach(path -> {
-                routes.produce(RouteBuildItem.builder()
-                        .routeFunction(path, new RouteFunction(path, bodyHandler.getHandler()))
-                        .handler(bodyHandler.getHandler()).build());
+                routes.produce(
+                        RouteBuildItem.builder().routeFunction(path, new RouteFunction(path, bodyHandler.getHandler()))
+                                .handler(bodyHandler.getHandler()).build());
 
-                routes.produce(RouteBuildItem.builder().routeFunction(path, new RouteFunction(
-                        path, httpHandler)).build());
+                routes.produce(RouteBuildItem.builder().routeFunction(path, new RouteFunction(path, httpHandler)).build());
             });
         }
     }

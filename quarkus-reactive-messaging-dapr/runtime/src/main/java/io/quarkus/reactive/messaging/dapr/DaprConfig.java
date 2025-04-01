@@ -19,7 +19,7 @@ public class DaprConfig {
     }
 
     public String key() {
-        return String.format("%s.%s", pubsubName, topic);
+        return String.format("%s/%s", pubsubName, topic);
     }
 
     public String path() {
