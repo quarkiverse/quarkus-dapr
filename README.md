@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/github/license/quarkiverse/quarkus-dapr)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Central](https://img.shields.io/maven-central/v/io.quarkiverse.dapr/quarkus-dapr-parent?color=green)](https://search.maven.org/search?q=g:io.quarkiverse.dapr%20AND%20a:quarkus-dapr-parent)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Introduction
@@ -94,6 +94,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://theleaderdev.com/"><img src="https://avatars.githubusercontent.com/u/1724114?v=4?s=100" width="100px;" alt="Yugo Sakamoto"/><br /><sub><b>Yugo Sakamoto</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=yugoccp" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/mcruzdev"><img src="https://avatars.githubusercontent.com/u/56329339?v=4?s=100" width="100px;" alt="Matheus Cruz"/><br /><sub><b>Matheus Cruz</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=mcruzdev" title="Code">💻</a> <a href="#maintenance-mcruzdev" title="Maintenance">🚧</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/luigirende"><img src="https://avatars.githubusercontent.com/u/17429625?v=4?s=100" width="100px;" alt="luigirende"/><br /><sub><b>luigirende</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=luigirende" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jghagemann"><img src="https://avatars.githubusercontent.com/u/42047435?v=4?s=100" width="100px;" alt="João Guilherme Hagemann"/><br /><sub><b>João Guilherme Hagemann</b></sub></a><br /><a href="https://github.com/quarkiverse/quarkus-dapr/commits?author=jghagemann" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
