@@ -33,7 +33,6 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-reactive-routes</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -49,8 +48,7 @@
                             <goal>extension-descriptor</goal>
                         </goals>
                         <configuration>
-                            <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}
-                            </deployment>
+                            <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
                         </configuration>
                     </execution>
                 </executions>
@@ -81,6 +79,18 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+              <groupId>org.jboss.jandex</groupId>
+              <artifactId>jandex-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>make-index</id>
+                  <goals>
+                    <goal>jandex</goal>
+                  </goals>
+                </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>
