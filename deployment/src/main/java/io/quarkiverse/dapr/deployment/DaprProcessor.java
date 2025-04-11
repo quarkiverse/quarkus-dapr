@@ -200,7 +200,7 @@ class DaprProcessor {
 
         String topicName = topic.value("name").asString();
 
-        log.info(String.format("topic name %s", topicName));
+        log.debug("Registering topic with name '{}'", topicName);
         String ruleMatch = Optional.ofNullable(topic.value("rule"))
                 .map(AnnotationValue::asNested)
                 .map(a -> a.value("match"))

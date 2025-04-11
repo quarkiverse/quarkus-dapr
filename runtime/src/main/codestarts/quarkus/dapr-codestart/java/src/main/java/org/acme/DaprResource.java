@@ -29,6 +29,9 @@ public class DaprResource {
     @Path("/state")
     public Response getState() {
         State<String> state = client.getState("kvstore", "identity", String.class);
+        if (state.getValue() == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         return Response.ok(Map.of("identity", state.getValue())).build();
     }
 
@@ -39,7 +42,7 @@ public class DaprResource {
     }
 
     @POST
-    @Topic(name = "topicName")
+    @Topic(name = "topicName", pubsubName = "pubsub")
     @Path("/sub")
     public void sub(CloudEvent<String> event) {
         System.out.println("Received event: " + event.getData());

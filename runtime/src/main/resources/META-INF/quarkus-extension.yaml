@@ -1,5 +1,5 @@
 name: Dapr
-description: Dapr for Quarkus
+description: Integrate Dapr with Quarkus to accelerate development of distributed and event-driven applications.
 artifact: ${project.groupId}:${project.artifactId}:${project.version}
 metadata:
   keywords:

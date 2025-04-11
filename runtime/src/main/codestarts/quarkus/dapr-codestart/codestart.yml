@@ -4,5 +4,5 @@ type: code
 tags: extension-codestart
 metadata:
   title: Dapr Extension Codestart
-  description: This codestart generates a Quarkus Dapr Extension
+  description: This Codestart creates a basic JAX-RS resource that demonstrates the use of PubSub and State Store building blocks
   related-guide-section: https://docs.quarkiverse.io/quarkus-dapr/dev/index.html
