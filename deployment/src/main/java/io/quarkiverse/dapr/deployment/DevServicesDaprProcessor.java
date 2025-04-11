@@ -10,13 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.DockerClientFactory;
 import org.testcontainers.Testcontainers;
-import org.testcontainers.containers.Network;
 import org.yaml.snakeyaml.Yaml;
 
 import io.dapr.testcontainers.Component;
@@ -42,7 +38,6 @@ public class DevServicesDaprProcessor {
     private static final String FEATURE = "dapr";
     private static final String DAPR_GRPC_PORT_PROPERTY = "dapr.grpc.port";
     private static final String DAPR_HTTP_PORT_PROPERTY = "dapr.http.port";
-    private static final int DAPR_DEFAULT_PORT = 8080;
     private static final String COMPONENTS_DIR = "components";
 
     static volatile DevServicesResultBuildItem.RunningDevService devService;
@@ -140,10 +135,6 @@ public class DevServicesDaprProcessor {
             LOGGER.warn("Was not possible to add custom components to Dapr Sidecar", e);
         }
 
-        createDaprNetwork();
-
-        dapr.withNetwork(getNetwork());
-
         Testcontainers.exposeHostPorts(QuarkusPorts.http(launchModeTest),
                 QuarkusPorts.grpc(launchModeTest));
 
@@ -157,20 +148,6 @@ public class DevServicesDaprProcessor {
                 new ContainerShutdownCloseable(dapr, "Dapr"),
                 Map.of());
 
-    }
-
-    private static void createDaprNetwork() {
-        List<com.github.dockerjava.api.model.Network> networks = DockerClientFactory.instance()
-                .client()
-                .listNetworksCmd()
-                .withNameFilter(FEATURE)
-                .exec();
-        if (networks.isEmpty()) {
-            Network.builder()
-                    .createNetworkCmdModifier(cmd -> cmd.withName(FEATURE))
-                    .build()
-                    .getId();
-        }
     }
 
     private static List<Component> tryGenerateComponentsFromResources(Yaml yaml) throws IOException {
@@ -223,25 +200,6 @@ public class DevServicesDaprProcessor {
                             metadataItemValue));
         }
         return Optional.of(new Component(name, type, version, metadataEntries));
-    }
-
-    private static Network getNetwork() {
-        return new Network() {
-            @Override
-            public String getId() {
-                return FEATURE;
-            }
-
-            @Override
-            public void close() {
-
-            }
-
-            @Override
-            public Statement apply(Statement base, Description description) {
-                return null;
-            }
-        };
     }
 
     private void shutdownDapr() {

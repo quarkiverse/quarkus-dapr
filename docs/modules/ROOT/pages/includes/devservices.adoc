@@ -115,7 +115,3 @@ spec:
     - name: redisPassword
       value: ""
 ----
-== Network
-
-By default, Dev Services for Dapr utilize a network named `dapr`.
-Dev Services search for a Docker Network named `dapr`; if one does not exist, Dev Services create it.
