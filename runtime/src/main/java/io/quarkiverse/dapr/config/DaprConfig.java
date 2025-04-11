@@ -30,7 +30,7 @@ public interface DaprConfig {
     Map<String, DaprPubSubConfig> pubSub();
 
     @ConfigGroup
-    public interface DaprPubSubConfig {
+    interface DaprPubSubConfig {
 
         /**
          * pub sub type
