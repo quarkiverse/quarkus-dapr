@@ -15,7 +15,7 @@ public interface DaprDevServiceBuildTimeConfig {
      * Whether this Dev Service should start with the application in dev mode or
      * tests.
      * <p>
-     * Dev Services are disabled by default.
+     * Dapr Dev Services are enabled by default.
      *
      * @asciidoclet
      */
