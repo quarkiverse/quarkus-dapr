@@ -3,7 +3,7 @@ package io.quarkiverse.dapr.workflows.simple;
 import io.dapr.workflows.Workflow;
 import io.dapr.workflows.WorkflowStub;
 
-public class SimpleWorkflow implements Workflow {
+public class DemoChainWorkflow implements Workflow {
     @Override
     public WorkflowStub create() {
         return ctx -> {

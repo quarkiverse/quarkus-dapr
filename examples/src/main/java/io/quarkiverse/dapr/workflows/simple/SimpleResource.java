@@ -30,7 +30,7 @@ public class SimpleResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response uppercase(String text) throws InterruptedException {
 
-        String instanceId = daprWorkflowClient.scheduleNewWorkflow(SimpleWorkflow.class, text);
+        String instanceId = daprWorkflowClient.scheduleNewWorkflow(DemoChainWorkflow.class, text);
 
         Log.info("Starting SimpleWorkflow with instance ID as " + instanceId);
 
