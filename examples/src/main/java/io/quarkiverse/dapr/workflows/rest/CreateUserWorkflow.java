@@ -1,8 +1,11 @@
 package io.quarkiverse.dapr.workflows.rest;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import io.dapr.workflows.Workflow;
 import io.dapr.workflows.WorkflowStub;
 
+@ApplicationScoped
 public class CreateUserWorkflow implements Workflow {
 
     @Override

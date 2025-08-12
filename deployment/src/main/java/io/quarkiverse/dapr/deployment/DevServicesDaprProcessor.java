@@ -10,15 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import io.quarkus.deployment.console.StartupLogCompressor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import org.yaml.snakeyaml.Yaml;
 
 import io.dapr.config.Properties;
 import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.DaprContainer;
+import io.dapr.testcontainers.DaprContainerConstants;
 import io.dapr.testcontainers.DaprLogLevel;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.config.DaprDevServiceBuildTimeConfig;
@@ -29,9 +30,9 @@ import io.quarkus.deployment.builditem.DevServicesResultBuildItem;
 import io.quarkus.deployment.builditem.DockerStatusBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.console.ConsoleInstalledBuildItem;
+import io.quarkus.deployment.console.StartupLogCompressor;
 import io.quarkus.deployment.logging.LoggingSetupBuildItem;
 import io.quarkus.devservices.common.ContainerShutdownCloseable;
-import io.quarkus.logging.Log;
 import io.quarkus.runtime.util.ClassPathUtils;
 
 public class DevServicesDaprProcessor {
@@ -119,7 +120,8 @@ public class DevServicesDaprProcessor {
             return null;
         }
 
-        DaprContainer dapr = new DaprContainer(config.daprdImage())
+        DaprContainer dapr = new DaprContainer(DockerImageName.parse(config.daprdImage()).asCompatibleSubstituteFor(
+                DaprContainerConstants.DAPR_RUNTIME_IMAGE_TAG))
                 .withAppName("local-dapr-app")
                 .withComponent(new Component("kvstore", "state.in-memory", "v1",
                         Collections.singletonMap("actorStateStore", String.valueOf(true))))
