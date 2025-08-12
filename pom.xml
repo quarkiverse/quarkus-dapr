@@ -30,6 +30,8 @@
     <dapr.version>1.14.1</dapr.version>
     <okhttp.version>4.12.0</okhttp.version>
     <assertj.version>3.27.3</assertj.version>
+    <dapr.testcontainers.version>0.15.0-rc-8</dapr.testcontainers.version>
+    <dapr.workflows.version>0.15.0-rc-8</dapr.workflows.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -54,6 +56,11 @@
         <groupId>io.dapr</groupId>
         <artifactId>dapr-sdk-actors</artifactId>
         <version>${dapr.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.dapr</groupId>
+        <artifactId>dapr-sdk-workflows</artifactId>
+        <version>${dapr.workflows.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -106,6 +113,7 @@
       <modules>
         <module>demo</module>
         <module>integration-tests</module>
+        <module>examples</module>
       </modules>
     </profile>
   </profiles>
