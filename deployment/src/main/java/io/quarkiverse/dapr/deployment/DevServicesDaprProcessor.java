@@ -13,10 +13,13 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import org.yaml.snakeyaml.Yaml;
 
+import io.dapr.config.Properties;
 import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.DaprContainer;
+import io.dapr.testcontainers.DaprContainerConstants;
 import io.dapr.testcontainers.DaprLogLevel;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.config.DaprDevServiceBuildTimeConfig;
@@ -36,8 +39,6 @@ public class DevServicesDaprProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DevServicesDaprProcessor.class);
     private static final String FEATURE = "dapr";
-    private static final String DAPR_GRPC_PORT_PROPERTY = "dapr.grpc.port";
-    private static final String DAPR_HTTP_PORT_PROPERTY = "dapr.http.port";
     private static final String COMPONENTS_DIR = "components";
 
     static volatile DevServicesResultBuildItem.RunningDevService devService;
@@ -119,8 +120,11 @@ public class DevServicesDaprProcessor {
             return null;
         }
 
-        DaprContainer dapr = new DaprContainer(config.daprdImage())
+        DaprContainer dapr = new DaprContainer(DockerImageName.parse(config.daprdImage()).asCompatibleSubstituteFor(
+                DaprContainerConstants.DAPR_RUNTIME_IMAGE_TAG))
                 .withAppName("local-dapr-app")
+                .withComponent(new Component("kvstore", "state.in-memory", "v1",
+                        Collections.singletonMap("actorStateStore", String.valueOf(true))))
                 .withAppPort(QuarkusPorts.http(launchModeTest))
                 .withDaprLogLevel(DaprLogLevel.DEBUG)
                 .withAppChannelAddress("host.testcontainers.internal");
@@ -140,14 +144,17 @@ public class DevServicesDaprProcessor {
 
         dapr.start();
 
-        System.setProperty(DAPR_GRPC_PORT_PROPERTY, Integer.toString(dapr.getGrpcPort()));
-        System.setProperty(DAPR_HTTP_PORT_PROPERTY, Integer.toString(dapr.getHttpPort()));
+        System.setProperty(Properties.GRPC_PORT.getName(), Integer.toString(dapr.getGrpcPort()));
+        System.setProperty(Properties.HTTP_PORT.getName(), Integer.toString(dapr.getHttpPort()));
 
         return new DevServicesResultBuildItem.RunningDevService(FEATURE,
                 dapr.getContainerId(),
                 new ContainerShutdownCloseable(dapr, "Dapr"),
-                Map.of());
-
+                Map.of(
+                        Properties.GRPC_PORT.getName(), Integer.toString(dapr.getGrpcPort()),
+                        Properties.HTTP_PORT.getName(), Integer.toString(dapr.getHttpPort()),
+                        Properties.HTTP_ENDPOINT.getName(), dapr.getHttpEndpoint(),
+                        Properties.GRPC_ENDPOINT.getName(), dapr.getGrpcEndpoint()));
     }
 
     private static List<Component> tryGenerateComponentsFromResources(Yaml yaml) throws IOException {

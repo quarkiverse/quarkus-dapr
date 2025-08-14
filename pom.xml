@@ -26,6 +26,8 @@
     <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <dapr.testcontainers.version>0.15.0-rc-8</dapr.testcontainers.version>
+    <dapr.workflows.version>0.15.0-rc-8</dapr.workflows.version>
     <quarkus.version>3.25.2</quarkus.version>
     <dapr.version>1.14.2</dapr.version>
     <okhttp.version>5.1.0</okhttp.version>
@@ -54,6 +56,11 @@
         <groupId>io.dapr</groupId>
         <artifactId>dapr-sdk-actors</artifactId>
         <version>${dapr.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.dapr</groupId>
+        <artifactId>dapr-sdk-workflows</artifactId>
+        <version>${dapr.workflows.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -106,6 +113,7 @@
       <modules>
         <module>demo</module>
         <module>integration-tests</module>
+        <module>examples</module>
       </modules>
     </profile>
   </profiles>
