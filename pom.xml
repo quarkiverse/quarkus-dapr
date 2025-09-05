@@ -27,7 +27,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.version>3.26.2</quarkus.version>
-    <dapr.version>1.14.2</dapr.version>
+    <dapr.version>1.15.1</dapr.version>
     <okhttp.version>5.1.0</okhttp.version>
     <assertj.version>3.27.4</assertj.version>
   </properties>
