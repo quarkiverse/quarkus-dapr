@@ -28,12 +28,6 @@
         <dependency>
             <groupId>io.dapr</groupId>
             <artifactId>dapr-sdk</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>grpc-netty-shaded</artifactId>
-                    <groupId>io.grpc</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dapr</groupId>
