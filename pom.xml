@@ -29,7 +29,7 @@
     <quarkus.version>3.28.0</quarkus.version>
     <dapr.version>1.14.2</dapr.version>
     <okhttp.version>5.1.0</okhttp.version>
-    <assertj.version>3.27.5</assertj.version>
+    <assertj.version>3.27.6</assertj.version>
   </properties>
   <dependencyManagement>
     <dependencies>
