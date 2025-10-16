@@ -55,6 +55,11 @@
         <artifactId>dapr-sdk-actors</artifactId>
         <version>${dapr.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.dapr</groupId>
+        <artifactId>dapr-sdk-workflows</artifactId>
+        <version>${dapr.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -106,6 +111,7 @@
       <modules>
         <module>demo</module>
         <module>integration-tests</module>
+        <module>examples</module>
       </modules>
     </profile>
   </profiles>
