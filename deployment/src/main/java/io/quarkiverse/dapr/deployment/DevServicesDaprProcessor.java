@@ -1,5 +1,7 @@
 package io.quarkiverse.dapr.deployment;
 
+import static io.dapr.testcontainers.DaprContainerConstants.DAPR_RUNTIME_IMAGE_TAG;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +15,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import org.yaml.snakeyaml.Yaml;
 
 import io.dapr.testcontainers.Component;
@@ -119,7 +122,9 @@ public class DevServicesDaprProcessor {
             return null;
         }
 
-        DaprContainer dapr = new DaprContainer(config.daprdImage())
+        DaprContainer dapr = new DaprContainer(DockerImageName.parse(config.daprdImage())
+                .asCompatibleSubstituteFor(
+                        DAPR_RUNTIME_IMAGE_TAG))
                 .withAppName("local-dapr-app")
                 .withAppPort(QuarkusPorts.http(launchModeTest))
                 .withDaprLogLevel(DaprLogLevel.DEBUG)
