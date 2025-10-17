@@ -21,7 +21,6 @@ import org.yaml.snakeyaml.Yaml;
 import io.dapr.config.Properties;
 import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.DaprContainer;
-import io.dapr.testcontainers.DaprContainerConstants;
 import io.dapr.testcontainers.DaprLogLevel;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.config.DaprDevServiceBuildTimeConfig;

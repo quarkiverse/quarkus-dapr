@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.Response;
 import io.dapr.workflows.client.DaprWorkflowClient;
 import io.dapr.workflows.client.WorkflowInstanceStatus;
 import io.dapr.workflows.client.WorkflowRuntimeStatus;
+import io.quarkiverse.dapr.workflows.rest.UserDetailsWorkflow;
 import io.quarkiverse.dapr.workflows.simple.DemoChainWorkflow;
 import io.quarkus.logging.Log;
 
@@ -21,6 +22,20 @@ public class WorkflowsResource {
 
     @Inject
     DaprWorkflowClient daprWorkflowClient;
+
+    @GET
+    @Path("/users/{userId}/details")
+    public Response users(@PathParam("userId") String userId) {
+
+        String instanceId = daprWorkflowClient.scheduleNewWorkflow(UserDetailsWorkflow.class, userId);
+
+        Log.info("Starting UserDetailsWorkflow with instance ID as " + instanceId);
+
+        return Response.accepted()
+                .header("Workflow-Instance-Id", instanceId)
+                .build();
+
+    }
 
     @Path("/uppercase")
     @POST
@@ -33,7 +48,7 @@ public class WorkflowsResource {
         Log.info("Starting SimpleWorkflow with instance ID as " + instanceId);
 
         return Response.accepted()
-                .header("X-Instance-Id", instanceId)
+                .header("Workflow-Instance-Id", instanceId)
                 .build();
     }
 

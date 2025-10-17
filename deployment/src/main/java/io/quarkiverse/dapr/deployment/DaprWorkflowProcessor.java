@@ -13,6 +13,7 @@ import io.dapr.workflows.runtime.WorkflowRuntimeBuilder;
 import io.quarkiverse.dapr.config.DaprConfig;
 import io.quarkiverse.dapr.deployment.items.WorkflowItemBuildItem;
 import io.quarkiverse.dapr.workflows.WorkflowRuntimeBuilderRecorder;
+import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -58,10 +59,17 @@ public class DaprWorkflowProcessor {
     }
 
     @BuildStep
-    public void produceAdditionalBeans(BuildProducer<UnremovableBeanBuildItem> unremovableBeans,
+    public void produceUnremovableBeans(BuildProducer<UnremovableBeanBuildItem> unremovableBeans,
             List<WorkflowItemBuildItem> workflowItems) {
         for (WorkflowItemBuildItem workflowItem : workflowItems) {
             unremovableBeans.produce(UnremovableBeanBuildItem.beanTypes(workflowItem.getClassName()));
+        }
+    }
+
+    @BuildStep
+    public void produceBeans(BuildProducer<AdditionalBeanBuildItem> beans, List<WorkflowItemBuildItem> workflowItems) {
+        for (WorkflowItemBuildItem workflowItem : workflowItems) {
+            beans.produce(new AdditionalBeanBuildItem(workflowItem.getClassName()));
         }
     }
 

@@ -52,6 +52,16 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-openapi</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.wiremock</groupId>
+            <artifactId>quarkus-wiremock</artifactId>
+            <version>1.5.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
