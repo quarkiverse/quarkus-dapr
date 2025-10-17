@@ -42,6 +42,12 @@
         <dependency>
             <groupId>io.dapr</groupId>
             <artifactId>dapr-sdk-workflows</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>grpc-netty-shaded</artifactId>
+                    <groupId>io.grpc</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
