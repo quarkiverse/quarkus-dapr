@@ -1,4 +1,4 @@
-package io.quarkiverse.dapr.deployment;
+package io.quarkiverse.dapr.deployment.devservices;
 
 import static io.dapr.testcontainers.DaprContainerConstants.DAPR_RUNTIME_IMAGE_TAG;
 
@@ -18,13 +18,17 @@ import org.testcontainers.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.yaml.snakeyaml.Yaml;
 
+import io.dapr.config.Properties;
 import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.DaprContainer;
 import io.dapr.testcontainers.DaprLogLevel;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.config.DaprDevServiceBuildTimeConfig;
+import io.quarkiverse.dapr.deployment.QuarkusPorts;
+import io.quarkiverse.dapr.deployment.items.AfterSubscribeRouteBuildItem;
 import io.quarkus.deployment.IsNormal;
 import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.Consume;
 import io.quarkus.deployment.builditem.CuratedApplicationShutdownBuildItem;
 import io.quarkus.deployment.builditem.DevServicesResultBuildItem;
 import io.quarkus.deployment.builditem.DockerStatusBuildItem;
@@ -39,8 +43,6 @@ public class DevServicesDaprProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DevServicesDaprProcessor.class);
     private static final String FEATURE = "dapr";
-    private static final String DAPR_GRPC_PORT_PROPERTY = "dapr.grpc.port";
-    private static final String DAPR_HTTP_PORT_PROPERTY = "dapr.http.port";
     private static final String COMPONENTS_DIR = "components";
 
     static volatile DevServicesResultBuildItem.RunningDevService devService;
@@ -48,6 +50,7 @@ public class DevServicesDaprProcessor {
     static volatile boolean first = true;
 
     @BuildStep(onlyIfNot = { IsNormal.class })
+    @Consume(AfterSubscribeRouteBuildItem.class)
     DevServicesResultBuildItem devServices(
             DockerStatusBuildItem dockerStatusBuildItem,
             DaprDevServiceBuildTimeConfig config,
@@ -128,6 +131,7 @@ public class DevServicesDaprProcessor {
                 .withAppName("local-dapr-app")
                 .withAppPort(QuarkusPorts.http(launchModeTest))
                 .withDaprLogLevel(DaprLogLevel.DEBUG)
+                .withAppHealthCheckThreshold(9)
                 .withAppChannelAddress("host.testcontainers.internal");
 
         Yaml yaml = new Yaml();
@@ -145,14 +149,17 @@ public class DevServicesDaprProcessor {
 
         dapr.start();
 
-        System.setProperty(DAPR_GRPC_PORT_PROPERTY, Integer.toString(dapr.getGrpcPort()));
-        System.setProperty(DAPR_HTTP_PORT_PROPERTY, Integer.toString(dapr.getHttpPort()));
+        System.setProperty(Properties.GRPC_PORT.getName(), Integer.toString(dapr.getGrpcPort()));
+        System.setProperty(Properties.HTTP_PORT.getName(), Integer.toString(dapr.getHttpPort()));
 
         return new DevServicesResultBuildItem.RunningDevService(FEATURE,
                 dapr.getContainerId(),
                 new ContainerShutdownCloseable(dapr, "Dapr"),
-                Map.of());
-
+                Map.of(
+                        Properties.GRPC_PORT.getName(), Integer.toString(dapr.getGrpcPort()),
+                        Properties.HTTP_PORT.getName(), Integer.toString(dapr.getHttpPort()),
+                        Properties.HTTP_ENDPOINT.getName(), dapr.getHttpEndpoint(),
+                        Properties.GRPC_ENDPOINT.getName(), dapr.getGrpcEndpoint()));
     }
 
     private static List<Component> tryGenerateComponentsFromResources(Yaml yaml) throws IOException {

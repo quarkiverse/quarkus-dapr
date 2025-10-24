@@ -20,7 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class DaprSubscriptionBuilder {
+public class SubscriptionBuilder {
+
     private final String pubsubName;
     private final String topic;
     private final List<TopicRule> rules;
@@ -33,7 +34,7 @@ class DaprSubscriptionBuilder {
      * @param pubsubName The pubsub name to subscribe to.
      * @param topic The topic to subscribe to.
      */
-    DaprSubscriptionBuilder(String pubsubName, String topic) {
+    public SubscriptionBuilder(String pubsubName, String topic) {
         this.pubsubName = pubsubName;
         this.topic = topic;
         this.rules = new ArrayList<>();
@@ -47,7 +48,7 @@ class DaprSubscriptionBuilder {
      * @param path The default path.
      * @return this instance.
      */
-    DaprSubscriptionBuilder setDefaultPath(String path) {
+    public SubscriptionBuilder setDefaultPath(String path) {
         if (defaultPath != null) {
             throw new RuntimeException(
                     String.format(
@@ -68,9 +69,8 @@ class DaprSubscriptionBuilder {
      * @param path The path to route to.
      * @param match The CEL expression the event must match.
      * @param priority The priority of the rule.
-     * @return this instance.
      */
-    public DaprSubscriptionBuilder addRule(String path, String match, int priority) {
+    public void addRule(String path, String match, int priority) {
         if (rules.stream().anyMatch(e -> e.getPriority() == priority)) {
             throw new RuntimeException(
                     String.format(
@@ -78,7 +78,6 @@ class DaprSubscriptionBuilder {
                             priority, this.topic, this.pubsubName));
         }
         rules.add(new TopicRule(path, match, priority));
-        return this;
     }
 
     /**
@@ -87,7 +86,7 @@ class DaprSubscriptionBuilder {
      * @param metadata The metadata.
      * @return this instance.
      */
-    public DaprSubscriptionBuilder setMetadata(Map<String, String> metadata) {
+    public SubscriptionBuilder setMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
         return this;
     }
@@ -102,7 +101,7 @@ class DaprSubscriptionBuilder {
         DaprTopicRoutes routes = null;
 
         if (!rules.isEmpty()) {
-            Collections.sort(rules, Comparator.comparingInt(TopicRule::getPriority));
+            rules.sort(Comparator.comparingInt(TopicRule::getPriority));
             List<DaprTopicRule> topicRules = rules.stream()
                     .map(e -> new DaprTopicRule(e.match, e.path)).collect(Collectors.toList());
             routes = new DaprTopicRoutes(topicRules, defaultPath);

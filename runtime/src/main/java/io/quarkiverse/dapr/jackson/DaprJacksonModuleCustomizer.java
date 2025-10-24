@@ -35,33 +35,33 @@ public class DaprJacksonModuleCustomizer implements ObjectMapperCustomizer {
 
     @Override
     public void customize(ObjectMapper objectMapper) {
-        // 配置[忽略未知字段]
+        // Configure: ignore unknown properties
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-        // 空对象可序列化
+        // Allow empty beans to be serialized (don't fail on empty beans)
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
-        // null属性不序列化
+        // Do not serialize null properties
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-        // 能解析注释符
+        // Allow backslash escaping of any character
         objectMapper.enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.mappedFeature());
 
-        // 能解析注释
+        // Allow comments in JSON
         objectMapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
 
-        // 解析单引号
+        // Allow single quotes in JSON
         objectMapper.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
 
-        // 配置[时间类型转换]
+        // Configure time type conversions
         JavaTimeModule timeModule = new JavaTimeModule();
-        // LocalDateTime序列化与反序列化
+        // LocalDateTime serialization and deserialization
         timeModule.addSerializer(new LocalDateTimeSerializer(DATE_TIME_FORMATTER));
         timeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DATE_TIME_FORMATTER));
-        // LocalDate序列化与反序列化
+        // LocalDate serialization and deserialization
         timeModule.addSerializer(new LocalDateSerializer(DATE_FORMATTER));
         timeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DATE_FORMATTER));
-        // LocalTime序列化与反序列化
+        // LocalTime serialization and deserialization
         timeModule.addSerializer(new LocalTimeSerializer(TIME_FORMATTER));
         timeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(TIME_FORMATTER));
         objectMapper.registerModule(timeModule);

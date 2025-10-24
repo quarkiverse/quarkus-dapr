@@ -3,6 +3,7 @@ package io.quarkiverse.dapr.demo;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -20,12 +21,21 @@ public class DaprResourceTest {
     }
 
     @Test
-    public void testTopicEndpoint() {
-        given()
-                .when().get("/dapr/subscribe")
-                .then()
-                .statusCode(200)
-                .body(is(
-                        "[{\"pubsubName\":\"messagebus\",\"topic\":\"topic1\",\"route\":\"/pubsub/topic1\",\"metadata\":{}}]"));
+    public void testSubscribeEndpoint() {
+
+        Subscription[] subscriptions = given()
+                .when()
+                .get("/dapr/subscribe")
+                .body()
+                .as(Subscription[].class);
+
+        Assertions.assertThat(subscriptions)
+                .anySatisfy(subscription -> {
+                    Assertions.assertThat(subscription.getPubsubName()).isEqualTo("messagebus");
+                    Assertions.assertThat(subscription.getTopic()).isEqualTo("topic1");
+                    Assertions.assertThat(subscription.getRoutes()).isNull();
+                    Assertions.assertThat(subscription.getRoute()).isEqualTo("/pubsub/topic1");
+                    Assertions.assertThat(subscription.getMetadata()).isEmpty();
+                });
     }
 }

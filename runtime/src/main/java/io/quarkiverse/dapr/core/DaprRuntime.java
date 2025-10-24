@@ -12,8 +12,9 @@ limitations under the License.
 */
 package io.quarkiverse.dapr.core;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Internal Singleton to handle Dapr configuration.
@@ -27,7 +28,7 @@ public class DaprRuntime {
     /**
      * Map of subscription builders.
      */
-    private final Map<DaprTopicKey, DaprSubscriptionBuilder> subscriptionBuilders = new HashMap<>();
+    private final Map<TopicKey, SubscriptionBuilder> subscriptionBuilders = new HashMap<>();
 
     /**
      * Private constructor to make this singleton.
@@ -68,15 +69,15 @@ public class DaprRuntime {
             int priority,
             String route,
             Map<String, String> metadata) {
-        DaprTopicKey topicKey = new DaprTopicKey(pubsubName, topicName);
+        TopicKey topicKey = new TopicKey(pubsubName, topicName);
 
-        DaprSubscriptionBuilder builder = subscriptionBuilders.get(topicKey);
+        SubscriptionBuilder builder = subscriptionBuilders.get(topicKey);
         if (builder == null) {
-            builder = new DaprSubscriptionBuilder(pubsubName, topicName);
+            builder = new SubscriptionBuilder(pubsubName, topicName);
             subscriptionBuilders.put(topicKey, builder);
         }
 
-        if (match.length() > 0) {
+        if (!match.isEmpty()) {
             builder.addRule(route, match, priority);
         } else if (Objects.isNull(builder.getDefaultPath())) {
             builder.setDefaultPath(route);
@@ -87,9 +88,4 @@ public class DaprRuntime {
         }
     }
 
-    public synchronized DaprTopicSubscription[] listSubscribedTopics() {
-        List<DaprTopicSubscription> values = subscriptionBuilders.values().stream()
-                .map(b -> b.build()).collect(Collectors.toList());
-        return values.toArray(new DaprTopicSubscription[0]);
-    }
 }

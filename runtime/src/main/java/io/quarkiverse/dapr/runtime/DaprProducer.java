@@ -17,14 +17,9 @@ import io.quarkus.arc.Unremovable;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.Startup;
 
-/**
- * DaprProducer
- *
- * @author naah69
- * @date 22022-04-01 17:42:02
- */
 @ApplicationScoped
 public class DaprProducer {
+
     @Produces
     @DefaultBean
     @Startup
@@ -58,9 +53,7 @@ public class DaprProducer {
     void onStop(@Observes ShutdownEvent ev, DaprClient client) {
         try {
             client.close();
-
-        } catch (Throwable e) {
-
+        } catch (Throwable ignored) {
         }
     }
 }

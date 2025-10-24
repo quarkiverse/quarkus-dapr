@@ -15,11 +15,11 @@ package io.quarkiverse.dapr.core;
 
 import java.util.Objects;
 
-class DaprTopicKey {
+public class TopicKey {
     private final String pubsubName;
     private final String topic;
 
-    DaprTopicKey(String pubsubName, String topic) {
+    public TopicKey(String pubsubName, String topic) {
         this.pubsubName = pubsubName;
         this.topic = topic;
     }
@@ -40,7 +40,7 @@ class DaprTopicKey {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DaprTopicKey that = (DaprTopicKey) o;
+        TopicKey that = (TopicKey) o;
         return pubsubName.equals(that.pubsubName) && topic.equals(that.topic);
     }
 

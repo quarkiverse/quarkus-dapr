@@ -106,6 +106,7 @@
       <modules>
         <module>demo</module>
         <module>integration-tests</module>
+        <module>examples</module>
       </modules>
     </profile>
   </profiles>
