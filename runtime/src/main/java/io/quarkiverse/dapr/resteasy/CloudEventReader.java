@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.enterprise.inject.spi.CDI;
-import jakarta.ws.rs.NotSupportedException;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
@@ -86,16 +85,12 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
             case MediaType.APPLICATION_XML:
             case MediaType.TEXT_XML:
             default:
-                // Handle text-based content types (text/plain, application/xml, text/xml, etc.)
-                // The data field contains the string representation of the content
                 return deserializeTextBasedCloudEvent(jsonNode, valueType);
         }
     }
 
     private static CloudEvent deserializeTextBasedCloudEvent(JsonNode jsonNode, JavaType valueType)
             throws IOException {
-        // For text-based content types, the entire jsonNode represents the CloudEvent
-        // The data field contains the string value directly
         return OBJECT_MAPPER.treeToValue(jsonNode, valueType);
     }
 
