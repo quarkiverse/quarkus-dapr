@@ -70,9 +70,6 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
         switch (dataContentType) {
             case MediaType.APPLICATION_JSON:
                 return OBJECT_MAPPER.treeToValue(jsonNode, valueType);
-            case MediaType.TEXT_PLAIN:
-                String data = jsonNode.get("data").asText();
-                return OBJECT_MAPPER.readValue(data, valueType);
             case MediaType.APPLICATION_OCTET_STREAM:
                 byte[] binaryData = jsonNode.get("data_base64").binaryValue();
                 String pubsubname = jsonNode.get("pubsubname").asText();
@@ -85,9 +82,21 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
                     return getCloudEvent(subJsonNode, valueType);
                 }
                 return OBJECT_MAPPER.readValue(binaryData, valueType);
+            case MediaType.TEXT_PLAIN:
+            case MediaType.APPLICATION_XML:
+            case MediaType.TEXT_XML:
             default:
-                throw new NotSupportedException("can't read unknown cloud event content type: " + dataContentType);
+                // Handle text-based content types (text/plain, application/xml, text/xml, etc.)
+                // The data field contains the string representation of the content
+                return deserializeTextBasedCloudEvent(jsonNode, valueType);
         }
+    }
+
+    private static CloudEvent deserializeTextBasedCloudEvent(JsonNode jsonNode, JavaType valueType)
+            throws IOException {
+        // For text-based content types, the entire jsonNode represents the CloudEvent
+        // The data field contains the string value directly
+        return OBJECT_MAPPER.treeToValue(jsonNode, valueType);
     }
 
 }
