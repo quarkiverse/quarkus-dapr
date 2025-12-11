@@ -1,4 +1,4 @@
-package io.quarkiverse.dapr.deployment;
+package io.quarkiverse.dapr.deployment.items;
 
 import java.util.Map;
 

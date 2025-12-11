@@ -22,7 +22,7 @@ import io.dapr.Topic;
 import io.dapr.client.domain.CloudEvent;
 import io.quarkiverse.dapr.core.DaprRuntime;
 import io.quarkiverse.dapr.core.DaprTopicSubscription;
-import io.quarkiverse.dapr.deployment.DaprTopicBuildItem;
+import io.quarkiverse.dapr.deployment.items.DaprTopicBuildItem;
 import io.quarkus.builder.BuildChainBuilder;
 import io.quarkus.builder.BuildContext;
 import io.quarkus.builder.BuildStep;
