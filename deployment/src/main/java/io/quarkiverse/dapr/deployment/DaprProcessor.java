@@ -31,6 +31,7 @@ import io.quarkiverse.dapr.config.DaprConfig;
 import io.quarkiverse.dapr.core.DaprTopicRoutes;
 import io.quarkiverse.dapr.core.DaprTopicRule;
 import io.quarkiverse.dapr.core.DaprTopicSubscription;
+import io.quarkiverse.dapr.deployment.items.DaprTopicBuildItem;
 import io.quarkiverse.dapr.endpoint.actor.ActorDeactivateHandler;
 import io.quarkiverse.dapr.endpoint.actor.ActorInvokeMethodHandler;
 import io.quarkiverse.dapr.endpoint.actor.ActorInvokeReminderHandler;

@@ -39,6 +39,10 @@
             <groupId>io.dapr</groupId>
             <artifactId>dapr-sdk-actors</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.dapr</groupId>
+            <artifactId>dapr-sdk-workflows</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

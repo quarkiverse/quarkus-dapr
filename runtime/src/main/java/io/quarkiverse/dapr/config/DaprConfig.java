@@ -29,6 +29,8 @@ public interface DaprConfig {
      */
     Map<String, DaprPubSubConfig> pubSub();
 
+    WorkflowsConfig workflow();
+
     @ConfigGroup
     interface DaprPubSubConfig {
 
