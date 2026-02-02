@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.dapr.client.DaprClient;
 import io.dapr.client.DaprClientBuilder;
+import io.dapr.workflows.client.DaprWorkflowClient;
 import io.quarkiverse.dapr.config.DaprConfig;
 import io.quarkiverse.dapr.core.SyncDaprClient;
 import io.quarkiverse.dapr.serializer.JacksonDaprObjectSerializer;
@@ -25,6 +26,16 @@ import io.quarkus.runtime.Startup;
  */
 @ApplicationScoped
 public class DaprProducer {
+
+    @Produces
+    @DefaultBean
+    @Startup
+    @Singleton
+    @Unremovable
+    public DaprWorkflowClient getDaprWorkflowClient() {
+        return new DaprWorkflowClient();
+    }
+
     @Produces
     @DefaultBean
     @Startup

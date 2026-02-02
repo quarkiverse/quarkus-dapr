@@ -73,6 +73,27 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++redis+++`
 
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-workflow-enabled]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-workflow-enabled[`quarkus.dapr.workflow.enabled`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.dapr.workflow.enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Indicates whether Dapr Workflow should be enabled.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_DAPR_WORKFLOW_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_DAPR_WORKFLOW_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++true+++`
+
 a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-type]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-type[`quarkus.dapr.pub-sub."pub-sub".type`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.pub-sub."pub-sub".type+++[]
