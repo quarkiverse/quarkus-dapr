@@ -26,6 +26,10 @@
             <artifactId>quarkus-rest-jackson</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-devservices</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.dapr</groupId>
             <artifactId>dapr-sdk</artifactId>
             <exclusions>
