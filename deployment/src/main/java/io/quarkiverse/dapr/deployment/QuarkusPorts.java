@@ -2,6 +2,8 @@ package io.quarkiverse.dapr.deployment;
 
 import org.eclipse.microprofile.config.ConfigProvider;
 
+import io.quarkus.runtime.LaunchMode;
+
 public class QuarkusPorts {
 
     enum Map {
@@ -19,16 +21,16 @@ public class QuarkusPorts {
         }
     }
 
-    public static int http(boolean isTest) {
-        if (isTest) {
+    public static int http(LaunchMode launchMode) {
+        if (launchMode == LaunchMode.TEST) {
             return ConfigProvider.getConfig().getOptionalValue(Map.HTTP_TEST.property, Integer.class)
                     .orElse(Map.HTTP_TEST.defaultPort);
         }
         return ConfigProvider.getConfig().getOptionalValue(Map.HTTP.property, Integer.class).orElse(Map.HTTP.defaultPort);
     }
 
-    public static int grpc(boolean isTest) {
-        if (isTest) {
+    public static int grpc(LaunchMode launchMode) {
+        if (launchMode == LaunchMode.TEST) {
             return ConfigProvider.getConfig().getOptionalValue(Map.GRPC_TEST.property, Integer.class)
                     .orElse(Map.GRPC_TEST.defaultPort);
         }
