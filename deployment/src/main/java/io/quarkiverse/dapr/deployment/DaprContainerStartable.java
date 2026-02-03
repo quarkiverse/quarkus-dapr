@@ -20,13 +20,14 @@ import org.testcontainers.utility.DockerImageName;
 import org.yaml.snakeyaml.Yaml;
 
 import io.dapr.testcontainers.Component;
+import io.dapr.testcontainers.DaprContainer;
 import io.dapr.testcontainers.DaprLogLevel;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkus.deployment.builditem.Startable;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.util.ClassPathUtils;
 
-public class DaprContainerStartable extends io.dapr.testcontainers.DaprContainer implements Startable {
+public class DaprContainerStartable extends DaprContainer implements Startable {
 
     private static final String COMPONENTS_DIR = "components";
     private static final Logger LOGGER = LoggerFactory.getLogger(DaprContainerStartable.class);
