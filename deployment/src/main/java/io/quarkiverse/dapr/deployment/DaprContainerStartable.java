@@ -36,7 +36,7 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
         super(DockerImageName.parse(dockerImage).asCompatibleSubstituteFor(
                 DAPR_RUNTIME_IMAGE_TAG));
 
-        this.withAppName("local-dapr-app")
+        super.withAppName("local-dapr-app")
                 .withComponent(new Component("kvstore", "state.in-memory", "v1",
                         Collections.singletonMap("actorStateStore", String.valueOf(true))))
                 .withAppPort(QuarkusPorts.http(launchMode))
