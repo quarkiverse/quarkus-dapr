@@ -30,7 +30,6 @@ import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.DaprContainer;
 import io.dapr.testcontainers.DaprLogLevel;
 import io.dapr.testcontainers.MetadataEntry;
-import io.quarkiverse.dapr.config.DaprDevServiceBuildTimeConfig;
 import io.quarkiverse.dapr.deployment.DaprProcessor;
 import io.quarkiverse.dapr.deployment.QuarkusPorts;
 import io.quarkus.deployment.builditem.Startable;
@@ -41,9 +40,8 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
 
     private static final String COMPONENTS_DIR = "components";
     private static final Logger LOGGER = LoggerFactory.getLogger(DaprContainerStartable.class);
-    private final DaprDevServiceBuildTimeConfig config;
 
-    private boolean configureForDashboard = false;
+    private final DaprDevServiceBuildTimeConfig config;
 
     public DaprContainerStartable(DaprDevServiceBuildTimeConfig config, LaunchMode launchMode, Network network) {
         super(DockerImageName.parse(config.daprdImage()).asCompatibleSubstituteFor(
@@ -160,7 +158,6 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
     }
 
     public void configureWithPgsqlStateStore() {
-        this.configureForDashboard = true;
         final Map<String, String> pgsql = new HashMap<>();
         pgsql.put("port", String.valueOf(POSTGRESQL_PORT));
         pgsql.put("host", PGSQL_NETWORK_ALIAS);

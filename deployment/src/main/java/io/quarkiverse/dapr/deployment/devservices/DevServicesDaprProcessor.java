@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import io.dapr.config.Properties;
-import io.quarkiverse.dapr.config.DaprDevServiceBuildTimeConfig;
 import io.quarkiverse.dapr.devui.DaprDashboardRPCService;
 import io.quarkus.arc.processor.BuiltinScope;
 import io.quarkus.deployment.IsLocalDevelopment;

@@ -1,7 +1,8 @@
-package io.quarkiverse.dapr.config;
+package io.quarkiverse.dapr.deployment.devservices;
 
 import java.util.Optional;
 
+import io.dapr.testcontainers.DaprContainerConstants;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.smallrye.config.ConfigMapping;
@@ -24,7 +25,7 @@ public interface DaprDevServiceBuildTimeConfig {
      * The Dapr container image to use.
      * <p>
      */
-    @WithDefault("daprio/daprd:latest")
+    @WithDefault(DaprContainerConstants.DAPR_RUNTIME_IMAGE_TAG)
     String daprdImage();
 
     /**
