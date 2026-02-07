@@ -16,8 +16,6 @@ public interface DaprDevServiceBuildTimeConfig {
      * tests.
      * <p>
      * Dapr Dev Services are enabled by default.
-     *
-     * @asciidoclet
      */
     @WithDefault("true")
     Optional<Boolean> enabled();
@@ -28,4 +26,19 @@ public interface DaprDevServiceBuildTimeConfig {
      */
     @WithDefault("daprio/daprd:latest")
     String daprdImage();
+
+    /**
+     * Dapr Dashboard configuration
+     */
+    Dashboard dashboard();
+
+    interface Dashboard {
+
+        /**
+         * Whether this Dev Service should start the Dapr Workflow Dashboard.
+         */
+        @WithDefault("true")
+        Optional<Boolean> enabled();
+
+    }
 }

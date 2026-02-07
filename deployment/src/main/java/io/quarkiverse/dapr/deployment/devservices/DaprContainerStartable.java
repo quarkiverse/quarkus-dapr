@@ -1,6 +1,11 @@
-package io.quarkiverse.dapr.deployment;
+package io.quarkiverse.dapr.deployment.devservices;
 
 import static io.dapr.testcontainers.DaprContainerConstants.DAPR_RUNTIME_IMAGE_TAG;
+import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.PASSWORD;
+import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.PGSQL_NETWORK_ALIAS;
+import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.PGSQL_STATE_STORE;
+import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.POSTGRESQL_PORT;
+import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.USERNAME;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -8,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +22,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
+import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
 import org.yaml.snakeyaml.Yaml;
 
@@ -23,6 +30,9 @@ import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.DaprContainer;
 import io.dapr.testcontainers.DaprLogLevel;
 import io.dapr.testcontainers.MetadataEntry;
+import io.quarkiverse.dapr.config.DaprDevServiceBuildTimeConfig;
+import io.quarkiverse.dapr.deployment.DaprProcessor;
+import io.quarkiverse.dapr.deployment.QuarkusPorts;
 import io.quarkus.deployment.builditem.Startable;
 import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.util.ClassPathUtils;
@@ -31,16 +41,20 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
 
     private static final String COMPONENTS_DIR = "components";
     private static final Logger LOGGER = LoggerFactory.getLogger(DaprContainerStartable.class);
+    private final DaprDevServiceBuildTimeConfig config;
 
-    public DaprContainerStartable(String dockerImage, LaunchMode launchMode) {
-        super(DockerImageName.parse(dockerImage).asCompatibleSubstituteFor(
+    private boolean configureForDashboard = false;
+
+    public DaprContainerStartable(DaprDevServiceBuildTimeConfig config, LaunchMode launchMode, Network network) {
+        super(DockerImageName.parse(config.daprdImage()).asCompatibleSubstituteFor(
                 DAPR_RUNTIME_IMAGE_TAG));
 
+        this.config = config;
+
         super.withAppName("local-dapr-app")
-                .withComponent(new Component("kvstore", "state.in-memory", "v1",
-                        Collections.singletonMap("actorStateStore", String.valueOf(true))))
                 .withAppPort(QuarkusPorts.http(launchMode))
                 .withDaprLogLevel(DaprLogLevel.DEBUG)
+                .withNetwork(network)
                 .withAppChannelAddress("host.testcontainers.internal");
 
         Testcontainers.exposeHostPorts(QuarkusPorts.http(launchMode),
@@ -68,6 +82,19 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
     @Override
     public void close() {
         super.close();
+    }
+
+    @Override
+    public void start() {
+        if (!config.dashboard().enabled().get()) {
+            // use in-memory
+            super.withComponent(new Component("kvstore", "state.in-memory", "v1",
+                    Collections.singletonMap("actorStateStore", String.valueOf(true))));
+        } else {
+            configureWithPgsqlStateStore();
+        }
+
+        super.start();
     }
 
     private List<Component> tryGenerateComponents() throws IOException {
@@ -130,5 +157,17 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
                             metadataItemValue));
         }
         return Optional.of(new Component(name, type, version, metadataEntries));
+    }
+
+    public void configureWithPgsqlStateStore() {
+        this.configureForDashboard = true;
+        final Map<String, String> pgsql = new HashMap<>();
+        pgsql.put("port", String.valueOf(POSTGRESQL_PORT));
+        pgsql.put("host", PGSQL_NETWORK_ALIAS);
+        pgsql.put("user", USERNAME);
+        pgsql.put("password", PASSWORD);
+        pgsql.put("database", DaprProcessor.FEATURE);
+        pgsql.put("actorStateStore", String.valueOf(true));
+        super.withComponent(new Component(PGSQL_STATE_STORE, "state.postgresql", "v2", pgsql));
     }
 }
