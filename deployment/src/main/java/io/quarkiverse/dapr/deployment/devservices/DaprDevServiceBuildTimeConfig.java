@@ -1,7 +1,8 @@
-package io.quarkiverse.dapr.config;
+package io.quarkiverse.dapr.deployment.devservices;
 
 import java.util.Optional;
 
+import io.dapr.testcontainers.DaprContainerConstants;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import io.smallrye.config.ConfigMapping;
@@ -16,8 +17,6 @@ public interface DaprDevServiceBuildTimeConfig {
      * tests.
      * <p>
      * Dapr Dev Services are enabled by default.
-     *
-     * @asciidoclet
      */
     @WithDefault("true")
     Optional<Boolean> enabled();
@@ -26,6 +25,21 @@ public interface DaprDevServiceBuildTimeConfig {
      * The Dapr container image to use.
      * <p>
      */
-    @WithDefault("daprio/daprd:latest")
+    @WithDefault(DaprContainerConstants.DAPR_RUNTIME_IMAGE_TAG)
     String daprdImage();
+
+    /**
+     * Dapr Dashboard configuration
+     */
+    Dashboard dashboard();
+
+    interface Dashboard {
+
+        /**
+         * Whether this Dev Service should start the Dapr Workflow Dashboard.
+         */
+        @WithDefault("true")
+        Optional<Boolean> enabled();
+
+    }
 }
