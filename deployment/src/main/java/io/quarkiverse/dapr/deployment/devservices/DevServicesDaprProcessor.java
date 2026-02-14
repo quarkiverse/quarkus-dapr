@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import io.quarkus.deployment.IsProduction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
@@ -20,7 +19,7 @@ import io.dapr.config.Properties;
 import io.quarkiverse.dapr.devui.DaprDashboardRPCService;
 import io.quarkus.arc.processor.BuiltinScope;
 import io.quarkus.deployment.IsLocalDevelopment;
-import io.quarkus.deployment.IsNormal;
+import io.quarkus.deployment.IsProduction;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.DevServicesResultBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
