@@ -119,8 +119,6 @@ public class DaprResource {
 
 <3> `topicName` must match the topic used in `publishEvent`. The `@io.dapr.Topic` annotation maps the endpoint to the topic.
 
-If you want to register custom Dapr components, place them under `src/main/resources/components`.
-
 <4> The value `sub` can be any path. It is used internally to expose the subscription endpoint.
 
 [IMPORTANT]
