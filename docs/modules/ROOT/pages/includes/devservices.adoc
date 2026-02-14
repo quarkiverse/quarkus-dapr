@@ -1,15 +1,65 @@
-Quarkus Dapr Extension provides a DevService to enhance your experience with Quarkus and Dapr.
+= Quarkus Dapr – Dev Services
 
-== Setting Dapr image
+The Quarkus Dapr Extension provides Dev Services to simplify local development when using Quarkus with Dapr. It automatically provisions the required infrastructure and configures the Dapr sidecar so you can focus on application development.
 
-Dev Services for Dapr uses the latest `daprio/daprd` image (`diagrid/daprd:latest`). You can change this image using the `quarkus.dapr.devservices.image-name` property.
+== Setting the Dapr Image
 
-== Using In-Memory Dapr Components
+Dev Services for Dapr uses container images that are compatible with the version defined by the `dapr/java-sdk` dependency.
 
-> [NOTE]
-The link:https://docs.dapr.io/concepts/components-concept[component] name for link:https://docs.dapr.io/reference/components-reference/supported-pubsub/setup-inmemory[Pub/Sub in-memory] is called `pubsub` and for link:https://docs.dapr.io/reference/components-reference/supported-state-stores/setup-inmemory/[State Store in-memory] is called `kvstore`.
+By default, the image version is aligned with the constant declared in the `dapr/java-sdk` library. This guarantees runtime compatibility between the Java SDK and the Dapr sidecar.
 
-Example of code using Pub/Sub and State Store in-memory:
+If necessary, you can override the default image by configuring:
+
+[source,properties]
+----
+quarkus.dapr.devservices.image-name=your-custom-image
+----
+
+== Dapr Dev Services – Provisioned Containers
+
+By default, Quarkus Dapr Dev Services starts the following containers:
+
+[source,bash]
+----
+docker.io/library/postgres
+ghcr.io/diagridio/diagrid-dashboard
+docker.io/daprio/placement
+docker.io/daprio/scheduler
+docker.io/daprio/daprd
+----
+
+The first two containers (`postgres` and `diagrid-dashboard`) are required to enable Dapr Dashboard integration in the Dev UI.
+
+In addition, Quarkus Dapr automatically provisions a State Store component named `kvstore`, configured to use the PostgreSQL instance.
+
+You can disable the Dapr Dashboard with:
+
+[source,properties]
+----
+quarkus.dapr.devservices.dashboard.enabled=false
+----
+
+[NOTE]
+====
+If the Dapr Dashboard is disabled, Quarkus Dapr automatically provisions an in-memory State Store component named `kvstore` instead of using PostgreSQL.
+====
+
+== Provided Dapr Components
+
+As described above, Quarkus Dapr automatically configures the Dapr sidecar with a State Store component.
+
+It also registers a Pub/Sub component. When running with Dev Services, this Pub/Sub component uses an in-memory implementation suitable for development and testing.
+
+[IMPORTANT]
+====
+The component name for Pub/Sub (in-memory) is `pubsub`.
+
+The component name for the State Store (in-memory or PostgreSQL) is `kvstore`.
+====
+
+== Using Dev Services
+
+The following example demonstrates how to use the automatically provisioned Pub/Sub and State Store components.
 
 [source,java]
 .DaprResource.java
@@ -63,20 +113,36 @@ public class DaprResource {
 }
 ----
 
-<1> `kvstore` is the name of the in-memory State Store component created by DevServices, and `identity` is the key used to store the value.
-<2> `pubsub` is the name of the in-memory Pub/Sub component created by DevServices, and `topicName` is the name of the topic used to publish the message (`Hello from Quarkus!`).
-<3> `topicName` is the name of the topic used to subscribe to the message, you need to add the `@io.dapr.Topic` annotation to map the topic.
-If you want to add a custom Dapr component, you need to add it to the `src/main/resources/components` folder.
-<4> The value `sub` can be any value, it is used behind the scenes to map the endpoint to the topic.
+<1> `kvstore` is the name of the State Store component created by Dev Services. `identity` is the key used to store the value.
 
-> [IMPORTANT]
-> The default `quarkus.dapr.default-pub-sub` value is `redis`, so you need to change to `pubsub` if you want to use the in-memory Pub/Sub component.
+<2> `pubsub` is the name of the Pub/Sub component created by Dev Services. `topicName` is the topic used to publish the message.
 
-== Adding Dapr Components
+<3> `topicName` must match the topic used in `publishEvent`. The `@io.dapr.Topic` annotation maps the endpoint to the topic.
 
-By default, Dapr DevServices create a Dapr container containing in-memory Pub/Sub and in-memory State Store building blocks. If you want to use a non-in-memory Dapr component, you need to add it to the `src/main/resources/components` folder.
+If you want to register custom Dapr components, place them under `src/main/resources/components`.
 
-Example of Pub/Sub using Redis.
+<4> The value `sub` can be any path. It is used internally to expose the subscription endpoint.
+
+[IMPORTANT]
+====
+The default value of `quarkus.dapr.default-pub-sub` is `redis`.
+If you want to use the in-memory Pub/Sub component provided by Dev Services, set it to:
+
+[source,properties]
+----
+quarkus.dapr.default-pub-sub=pubsub
+----
+====
+
+== Adding Custom Dapr Components
+
+To use non in-memory Dapr components, add them to the following directory:
+
+----
+src/main/resources/components
+----
+
+=== Example: Pub/Sub with Redis
 
 [source,yaml]
 .src/main/resources/components/redis-pubsub.yaml
@@ -95,7 +161,7 @@ spec:
       value: ""
 ----
 
-Example of State Store using Redis:
+=== Example: State Store with Redis
 
 [source,yaml]
 .src/main/resources/components/redis-statestore.yaml
@@ -115,3 +181,5 @@ spec:
     - name: redisPassword
       value: ""
 ----
+
+Quarkus Dapr automatically detects these files and configures the Dapr sidecar with the provided components during application startup.

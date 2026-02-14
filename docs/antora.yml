@@ -1,5 +1,8 @@
 name: quarkus-dapr
 title: Dapr
 version: dev
+asciidoc:
+  attributes:
+    dapr-version: 1.17.0-rc.2
 nav:
   - modules/ROOT/nav.adoc

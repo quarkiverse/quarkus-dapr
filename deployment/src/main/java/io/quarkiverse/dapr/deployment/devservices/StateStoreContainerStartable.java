@@ -14,7 +14,7 @@ public class StateStoreContainerStartable extends PostgreSQLContainer implements
     public static String PGSQL_NETWORK_ALIAS = POSTGRES;
     public static String USERNAME = POSTGRES;
     public static String PASSWORD = POSTGRES;
-    public static String PGSQL_STATE_STORE = "pgsqlstatstore";
+    public static String PGSQL_STATE_STORE = "kvstore";
 
     public StateStoreContainerStartable(Network network) {
         super(DockerImageName.parse("postgres"));
