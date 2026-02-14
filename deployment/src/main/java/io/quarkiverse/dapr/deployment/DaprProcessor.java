@@ -62,7 +62,7 @@ import io.quarkus.vertx.http.deployment.RouteBuildItem;
  * @author naah69
  * @date 22022-04-01 17:42:02
  */
-class DaprProcessor {
+public class DaprProcessor {
 
     private static final Logger log = LoggerFactory.getLogger(DaprProcessor.class);
 

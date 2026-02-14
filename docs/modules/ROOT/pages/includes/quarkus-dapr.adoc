@@ -15,9 +15,8 @@ endif::add-copy-button-to-config-props[]
 
 [.description]
 --
-Whether this Dev Service should start with the application in dev mode or
-tests.
-<p>
+Whether this Dev Service should start with the application in dev mode or tests.
+
 Dapr Dev Services are enabled by default.
 
 
@@ -50,7 +49,28 @@ Environment variable: `+++QUARKUS_DAPR_DEVSERVICES_DAPRD_IMAGE+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
-|`+++daprio/daprd:latest+++`
+|`+++daprio/daprd:1.17.0-rc.2+++`
+
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-devservices-dashboard-enabled]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-devservices-dashboard-enabled[`quarkus.dapr.devservices.dashboard.enabled`]##
+ifdef::add-copy-button-to-config-props[]
+config_property_copy_button:+++quarkus.dapr.devservices.dashboard.enabled+++[]
+endif::add-copy-button-to-config-props[]
+
+
+[.description]
+--
+Whether this Dev Service should start the Dapr Workflow Dashboard.
+
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_DAPR_DEVSERVICES_DASHBOARD_ENABLED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_DAPR_DEVSERVICES_DASHBOARD_ENABLED+++`
+endif::add-copy-button-to-env-var[]
+--
+|boolean
+|`+++true+++`
 
 a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-default-pub-sub]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-default-pub-sub[`quarkus.dapr.default-pub-sub`]##
 ifdef::add-copy-button-to-config-props[]
