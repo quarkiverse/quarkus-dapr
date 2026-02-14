@@ -8,7 +8,7 @@
   </parent>
   <groupId>io.quarkiverse.dapr</groupId>
   <artifactId>quarkus-dapr-parent</artifactId>
-  <version>999-SNAPSHOT</version>
+  <version>2.5.0-rc.3</version>
   <packaging>pom</packaging>
   <name>Quarkus - Dapr - Parent</name>
   <modules>
@@ -19,7 +19,7 @@
     <connection>:git:git@github.com:quarkiverse/quarkus-dapr.git</connection>
     <developerConnection>scm:git:git@github.com:quarkiverse/quarkus-dapr.git</developerConnection>
     <url>https://github.com/quarkiverse/quarkus-dapr</url>
-    <tag>HEAD</tag>
+    <tag>2.5.0-rc.3</tag>
   </scm>
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
