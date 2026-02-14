@@ -2,6 +2,7 @@ package io.quarkiverse.dapr.deployment.devservices;
 
 import static io.quarkiverse.dapr.deployment.DaprProcessor.FEATURE;
 import static io.quarkiverse.dapr.deployment.devservices.DashboardContainerStartable.INTERNAL_DAPR_DASHBOARD_WORKFLOW_PORT;
+import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.PGSQL_STATE_STORE;
 import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.POSTGRESQL_PORT;
 import static io.quarkiverse.dapr.devui.DaprDashboardRPCService.DAPR_DASHBOARD_WORKFLOW_URL;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import io.quarkus.deployment.IsProduction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
@@ -52,7 +54,7 @@ public class DevServicesDaprProcessor {
         return new JsonRPCProvidersBuildItem(DaprDashboardRPCService.class, BuiltinScope.SINGLETON.getName());
     }
 
-    @BuildStep(onlyIfNot = { IsNormal.class })
+    @BuildStep(onlyIfNot = { IsProduction.class })
     List<DevServicesResultBuildItem> devServices(
             DaprDevServiceBuildTimeConfig config,
             LaunchModeBuildItem launchMode) {
@@ -61,7 +63,8 @@ public class DevServicesDaprProcessor {
             return null;
         }
 
-        Network.NetworkImpl network = Network.builder().build();
+        Network.NetworkImpl network = Network.builder()
+                .build();
 
         List<DevServicesResultBuildItem> containers = new ArrayList<>();
         DevServicesResultBuildItem dapr = configureDaprContainer(config, launchMode, network);
@@ -79,7 +82,7 @@ public class DevServicesDaprProcessor {
 
     private static DevServicesResultBuildItem configureDaprContainer(DaprDevServiceBuildTimeConfig config,
             LaunchModeBuildItem launchMode, Network network) {
-        return DevServicesResultBuildItem.owned()
+        DevServicesResultBuildItem.OwnedServiceBuilder<Startable> builder = DevServicesResultBuildItem.owned()
                 .serviceName(FEATURE)
                 .feature(FEATURE)
                 .startable(new Supplier<Startable>() {
@@ -88,7 +91,15 @@ public class DevServicesDaprProcessor {
                         return new DaprContainerStartable(config,
                                 launchMode.getLaunchMode(), network);
                     }
-                })
+                });
+
+        if (config.dashboard().enabled().get()) {
+            builder.dependsOnConfig(POSTGRESQL_PORT_PROPERTY, (startable, value) -> {
+                LOGGER.info("Dapr statestore {} is running", PGSQL_STATE_STORE);
+            });
+        }
+
+        return builder
                 .postStartHook(startable -> {
                     DaprContainerStartable daprContainerStartable = (DaprContainerStartable) startable;
                     System.setProperty(Properties.GRPC_PORT.getName(), Integer.toString(daprContainerStartable.getGrpcPort()));
@@ -97,7 +108,7 @@ public class DevServicesDaprProcessor {
                 .build();
     }
 
-    private static DevServicesResultBuildItem configureDashboardWorkflowContainer(Network.NetworkImpl network) {
+    private static DevServicesResultBuildItem configureDashboardWorkflowContainer(Network network) {
         DevServicesResultBuildItem dashboard = DevServicesResultBuildItem.owned()
                 .serviceName(DASHBOARD_WORKFLOW)
                 .feature(FEATURE)
@@ -120,8 +131,8 @@ public class DevServicesDaprProcessor {
         return dashboard;
     }
 
-    private static DevServicesResultBuildItem configurePgsqlContainer(Network.NetworkImpl network) {
-        DevServicesResultBuildItem pgsql = DevServicesResultBuildItem.owned()
+    private static DevServicesResultBuildItem configurePgsqlContainer(Network network) {
+        return DevServicesResultBuildItem.owned()
                 .serviceName(STATESTORE_PG)
                 .feature(FEATURE)
                 .configProvider(Map.of(POSTGRESQL_PORT_PROPERTY, startable -> {
@@ -135,6 +146,5 @@ public class DevServicesDaprProcessor {
                     }
                 })
                 .build();
-        return pgsql;
     }
 }
