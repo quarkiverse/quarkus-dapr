@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.enterprise.inject.spi.CDI;
-import jakarta.ws.rs.NotSupportedException;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
@@ -70,9 +69,6 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
         switch (dataContentType) {
             case MediaType.APPLICATION_JSON:
                 return OBJECT_MAPPER.treeToValue(jsonNode, valueType);
-            case MediaType.TEXT_PLAIN:
-                String data = jsonNode.get("data").asText();
-                return OBJECT_MAPPER.readValue(data, valueType);
             case MediaType.APPLICATION_OCTET_STREAM:
                 byte[] binaryData = jsonNode.get("data_base64").binaryValue();
                 String pubsubname = jsonNode.get("pubsubname").asText();
@@ -85,9 +81,17 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
                     return getCloudEvent(subJsonNode, valueType);
                 }
                 return OBJECT_MAPPER.readValue(binaryData, valueType);
+            case MediaType.TEXT_PLAIN:
+            case MediaType.APPLICATION_XML:
+            case MediaType.TEXT_XML:
             default:
-                throw new NotSupportedException("can't read unknown cloud event content type: " + dataContentType);
+                return deserializeTextBasedCloudEvent(jsonNode, valueType);
         }
+    }
+
+    private static CloudEvent deserializeTextBasedCloudEvent(JsonNode jsonNode, JavaType valueType)
+            throws IOException {
+        return OBJECT_MAPPER.treeToValue(jsonNode, valueType);
     }
 
 }
