@@ -31,9 +31,7 @@ import io.dapr.testcontainers.DaprContainer;
 import io.dapr.testcontainers.DaprLogLevel;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.deployment.DaprProcessor;
-import io.quarkiverse.dapr.deployment.QuarkusPorts;
 import io.quarkus.deployment.builditem.Startable;
-import io.quarkus.runtime.LaunchMode;
 import io.quarkus.runtime.util.ClassPathUtils;
 
 public class DaprContainerStartable extends DaprContainer implements Startable {
@@ -43,20 +41,19 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
 
     private final DaprDevServiceBuildTimeConfig config;
 
-    public DaprContainerStartable(DaprDevServiceBuildTimeConfig config, LaunchMode launchMode, Network network) {
+    public DaprContainerStartable(DaprDevServiceBuildTimeConfig config, int appPort, int grpcPort, Network network) {
         super(DockerImageName.parse(config.daprdImage()).asCompatibleSubstituteFor(
                 DAPR_RUNTIME_IMAGE_TAG));
 
         this.config = config;
 
         super.withAppName("local-dapr-app")
-                .withAppPort(QuarkusPorts.http(launchMode))
+                .withAppPort(appPort)
                 .withDaprLogLevel(DaprLogLevel.DEBUG)
                 .withNetwork(network)
                 .withAppChannelAddress("host.testcontainers.internal");
 
-        Testcontainers.exposeHostPorts(QuarkusPorts.http(launchMode),
-                QuarkusPorts.grpc(launchMode));
+        Testcontainers.exposeHostPorts(appPort, grpcPort);
 
         generateDeclaredComponents();
     }
