@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import io.dapr.durabletask.TaskActivity;
 import io.dapr.durabletask.TaskActivityFactory;
 import io.dapr.durabletask.TaskOrchestration;
-import io.dapr.durabletask.TaskOrchestrationFactory;
+import io.dapr.durabletask.orchestration.TaskOrchestrationFactory;
 import io.dapr.workflows.Workflow;
 import io.dapr.workflows.WorkflowActivity;
 import io.dapr.workflows.runtime.DefaultWorkflowActivityContext;
@@ -46,6 +46,16 @@ public class WorkflowRuntimeBuilderRecorder {
                     @Override
                     public TaskOrchestration create() {
                         return ctx -> w.run(new DefaultWorkflowContext(ctx, w.getClass()));
+                    }
+
+                    @Override
+                    public String getVersionName() {
+                        return "";
+                    }
+
+                    @Override
+                    public Boolean isLatestVersion() {
+                        return null;
                     }
                 });
             } catch (ClassNotFoundException e) {
