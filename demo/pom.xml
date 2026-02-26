@@ -4,10 +4,10 @@
     <parent>
         <groupId>io.quarkiverse.dapr</groupId>
         <artifactId>quarkus-dapr-parent</artifactId>
-        <version>2.5.0-rc.4</version>
+        <version>999-SNAPSHOT</version>
     </parent>
     <artifactId>quarkus-dapr-demo-parent</artifactId>
-    <version>2.5.0-rc.4</version>
+    <version>999-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Quarkus - Dapr - Demo</name>
     <modules>
