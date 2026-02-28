@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
 import io.dapr.config.Properties;
+import io.quarkiverse.dapr.deployment.QuarkusPorts;
 import io.quarkiverse.dapr.devui.DaprDashboardRPCService;
 import io.quarkus.arc.processor.BuiltinScope;
 import io.quarkus.deployment.IsLocalDevelopment;
@@ -81,14 +82,15 @@ public class DevServicesDaprProcessor {
 
     private static DevServicesResultBuildItem configureDaprContainer(DaprDevServiceBuildTimeConfig config,
             LaunchModeBuildItem launchMode, Network network) {
+        int appPort = QuarkusPorts.http(launchMode.getLaunchMode());
+        int grpcPort = QuarkusPorts.grpc(launchMode.getLaunchMode());
         DevServicesResultBuildItem.OwnedServiceBuilder<Startable> builder = DevServicesResultBuildItem.owned()
                 .serviceName(FEATURE)
                 .feature(FEATURE)
                 .startable(new Supplier<Startable>() {
                     @Override
                     public Startable get() {
-                        return new DaprContainerStartable(config,
-                                launchMode.getLaunchMode(), network);
+                        return new DaprContainerStartable(config, appPort, grpcPort, network);
                     }
                 });
 
