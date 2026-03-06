@@ -31,7 +31,7 @@ public class WorkflowsResource {
 
         Log.info("DemoChainWorkflow.class: " + DemoChainWorkflow.class.getName());
 
-        String instanceId = daprWorkflowClient.scheduleNewWorkflow(DemoChainWorkflow.class, text);
+        String instanceId = daprWorkflowClient.scheduleNewWorkflow("demo-chain", text);
 
         Log.info("Starting DemoChainWorkflow with instance ID as " + instanceId);
 
