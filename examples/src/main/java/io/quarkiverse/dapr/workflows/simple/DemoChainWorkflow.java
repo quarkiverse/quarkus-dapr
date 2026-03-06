@@ -4,8 +4,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import io.dapr.workflows.Workflow;
 import io.dapr.workflows.WorkflowStub;
+import io.quarkiverse.dapr.workflows.WorkflowMetadata;
 
 @ApplicationScoped
+@WorkflowMetadata(name = "demo-chain")
 public class DemoChainWorkflow implements Workflow {
 
     @Override
@@ -17,7 +19,7 @@ public class DemoChainWorkflow implements Workflow {
             ctx.getLogger().info("Workflow instance: {}", instanceId);
 
             String result = ctx
-                    .callActivity(UppercaseWorkflowActivity.class.getName(), ctx.getInput(String.class), String.class).await();
+                    .callActivity("uppercase", ctx.getInput(String.class), String.class).await();
 
             ctx.getLogger().info("Workflow result: {}", result);
 

@@ -7,9 +7,11 @@ import jakarta.inject.Inject;
 
 import io.dapr.workflows.WorkflowActivity;
 import io.dapr.workflows.WorkflowActivityContext;
+import io.quarkiverse.dapr.workflows.ActivityMetadata;
 import io.quarkus.logging.Log;
 
 @ApplicationScoped
+@ActivityMetadata(name = "uppercase")
 public class UppercaseWorkflowActivity implements WorkflowActivity {
 
     @Inject
