@@ -5,10 +5,13 @@ import static io.quarkiverse.dapr.deployment.devservices.DashboardContainerStart
 import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.PGSQL_STATE_STORE;
 import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.POSTGRESQL_PORT;
 import static io.quarkiverse.dapr.devui.DaprDashboardRPCService.DAPR_DASHBOARD_WORKFLOW_URL;
+import static io.quarkus.devservices.common.ContainerLocator.locateContainerWithLabels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -24,6 +27,8 @@ import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.DevServicesResultBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.Startable;
+import io.quarkus.devservices.common.ContainerAddress;
+import io.quarkus.devservices.common.ContainerLocator;
 import io.quarkus.devui.spi.JsonRPCProvidersBuildItem;
 import io.quarkus.devui.spi.page.CardPageBuildItem;
 import io.quarkus.devui.spi.page.Page;
@@ -31,6 +36,11 @@ import io.quarkus.devui.spi.page.Page;
 public class DevServicesDaprProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DevServicesDaprProcessor.class);
+    static final String DEV_SERVICE_LABEL = "quarkus-dev-service-dapr";
+    private static final int DAPR_INTERNAL_HTTP_PORT = 3500;
+    private static final int DAPR_INTERNAL_GRPC_PORT = 50001;
+    private static final ContainerLocator DAPR_CONTAINER_LOCATOR = locateContainerWithLabels(DAPR_INTERNAL_HTTP_PORT,
+            DEV_SERVICE_LABEL);
 
     private static final String QUARKUS_DAPR_SERVICE_NAME_PREFIX = "quarkus-dev-service-";
     private static final String DASHBOARD_WORKFLOW = QUARKUS_DAPR_SERVICE_NAME_PREFIX + "dashboard-workflow";
@@ -66,6 +76,12 @@ public class DevServicesDaprProcessor {
                 .build();
 
         List<DevServicesResultBuildItem> containers = new ArrayList<>();
+        DevServicesResultBuildItem discoveredDapr = discoverDaprContainer(config, launchMode);
+        if (discoveredDapr != null) {
+            containers.add(discoveredDapr);
+            return containers;
+        }
+
         DevServicesResultBuildItem dapr = configureDaprContainer(config, launchMode, network);
         containers.add(dapr);
 
@@ -77,6 +93,34 @@ public class DevServicesDaprProcessor {
         }
 
         return containers;
+    }
+
+    private static DevServicesResultBuildItem discoverDaprContainer(DaprDevServiceBuildTimeConfig config,
+            LaunchModeBuildItem launchModeBuildItem) {
+        Map<Integer, ContainerAddress> mappedPorts = new HashMap<>();
+        Optional<String> containerId = DAPR_CONTAINER_LOCATOR.locateContainer(config.serviceName(), config.shared().get(),
+                launchModeBuildItem.getLaunchMode(),
+                mappedPorts::put);
+
+        if (containerId.isEmpty()) {
+            return null;
+        }
+
+        ContainerAddress grpcAddress = mappedPorts.get(DAPR_INTERNAL_GRPC_PORT);
+        ContainerAddress httpAddress = mappedPorts.get(DAPR_INTERNAL_HTTP_PORT);
+        if (grpcAddress == null || httpAddress == null) {
+            LOGGER.warn("Found shared Dapr container {} but missing mapped ports. Creating a new container instead.",
+                    containerId.get());
+            return null;
+        }
+
+        configureDaprPorts(grpcAddress.getPort(), httpAddress.getPort());
+        LOGGER.info("Re-using shared Dapr container {} listening on HTTP {} and gRPC {}",
+                containerId.get(), httpAddress.getPort(), grpcAddress.getPort());
+        return DevServicesResultBuildItem.discovered()
+                .name(FEATURE)
+                .containerId(containerId.get())
+                .build();
     }
 
     private static DevServicesResultBuildItem configureDaprContainer(DaprDevServiceBuildTimeConfig config,
@@ -101,10 +145,14 @@ public class DevServicesDaprProcessor {
         return builder
                 .postStartHook(startable -> {
                     DaprContainerStartable daprContainerStartable = (DaprContainerStartable) startable;
-                    System.setProperty(Properties.GRPC_PORT.getName(), Integer.toString(daprContainerStartable.getGrpcPort()));
-                    System.setProperty(Properties.HTTP_PORT.getName(), Integer.toString(daprContainerStartable.getHttpPort()));
+                    configureDaprPorts(daprContainerStartable.getGrpcPort(), daprContainerStartable.getHttpPort());
                 })
                 .build();
+    }
+
+    private static void configureDaprPorts(int grpcPort, int httpPort) {
+        System.setProperty(Properties.GRPC_PORT.getName(), Integer.toString(grpcPort));
+        System.setProperty(Properties.HTTP_PORT.getName(), Integer.toString(httpPort));
     }
 
     private static DevServicesResultBuildItem configureDashboardWorkflowContainer(Network network) {
