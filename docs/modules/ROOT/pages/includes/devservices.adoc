@@ -12,8 +12,20 @@ If necessary, you can override the default image by configuring:
 
 [source,properties]
 ----
-quarkus.dapr.devservices.image-name=your-custom-image
+quarkus.dapr.devservices.daprd-image=your-custom-image
 ----
+
+== Shared container
+
+Quarkus Dapr Dev Services can re-use an already running Dapr container in dev mode, following the same shared-container pattern used by other Dev Services.
+
+[source,properties]
+----
+quarkus.dapr.devservices.shared=true
+quarkus.dapr.devservices.service-name=dapr
+----
+
+When `shared=true`, Quarkus looks for a running container with a matching `service-name` label and re-uses it instead of creating a new container.
 
 == Dapr Dev Services – Provisioned Containers
 
