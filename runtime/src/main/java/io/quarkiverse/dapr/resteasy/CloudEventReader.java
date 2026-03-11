@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.enterprise.inject.spi.CDI;
-import jakarta.ws.rs.NotSupportedException;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
@@ -66,27 +65,34 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
 
     private static CloudEvent getCloudEvent(JsonNode jsonNode, JavaType valueType)
             throws IOException {
-        String dataContentType = jsonNode.get("datacontenttype").asText();
-        switch (dataContentType) {
-            case MediaType.APPLICATION_JSON:
-                return OBJECT_MAPPER.treeToValue(jsonNode, valueType);
-            case MediaType.TEXT_PLAIN:
-                String data = jsonNode.get("data").asText();
-                return OBJECT_MAPPER.readValue(data, valueType);
-            case MediaType.APPLICATION_OCTET_STREAM:
-                byte[] binaryData = jsonNode.get("data_base64").binaryValue();
-                String pubsubname = jsonNode.get("pubsubname").asText();
-                String rawPayload = Optional.ofNullable(DAPR_CONFIG.pubSub().get(pubsubname))
-                        .map(a -> a.consumeMetadata())
-                        .map(a -> a.get("rawPayload"))
-                        .orElse("");
-                if (Objects.equals("true", rawPayload)) {
-                    JsonNode subJsonNode = OBJECT_MAPPER.readTree(binaryData);
-                    return getCloudEvent(subJsonNode, valueType);
-                }
-                return OBJECT_MAPPER.readValue(binaryData, valueType);
-            default:
-                throw new NotSupportedException("can't read unknown cloud event content type: " + dataContentType);
+        String dataContentType = Optional.ofNullable(jsonNode.get("datacontenttype"))
+                .map(JsonNode::asText)
+                .orElse(MediaType.APPLICATION_JSON);
+        if (isOctetStream(dataContentType)) {
+            byte[] binaryData = jsonNode.get("data_base64").binaryValue();
+            String pubsubname = jsonNode.get("pubsubname").asText();
+            String rawPayload = Optional.ofNullable(DAPR_CONFIG.pubSub().get(pubsubname))
+                    .map(a -> a.consumeMetadata())
+                    .map(a -> a.get("rawPayload"))
+                    .orElse("");
+            if (Objects.equals("true", rawPayload)) {
+                JsonNode subJsonNode = OBJECT_MAPPER.readTree(binaryData);
+                return getCloudEvent(subJsonNode, valueType);
+            }
+            return OBJECT_MAPPER.readValue(binaryData, valueType);
+        }
+        return OBJECT_MAPPER.treeToValue(jsonNode, valueType);
+    }
+
+    private static boolean isOctetStream(String dataContentType) {
+        if (dataContentType == null) {
+            return false;
+        }
+        try {
+            MediaType mediaType = MediaType.valueOf(dataContentType);
+            return mediaType.isCompatible(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        } catch (IllegalArgumentException ex) {
+            return dataContentType.startsWith(MediaType.APPLICATION_OCTET_STREAM);
         }
     }
 
