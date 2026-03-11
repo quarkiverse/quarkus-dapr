@@ -16,12 +16,14 @@
  */
 package io.quarkiverse.dapr.demo;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 
 import io.dapr.Rule;
 import io.dapr.Topic;
+import io.dapr.client.domain.CloudEvent;
 
 @Path("/dapr")
 public class DaprResource {
@@ -71,5 +73,12 @@ public class DaprResource {
     @Topic(name = "${topic.six}", pubsubName = "${pubsub.six}", rule = @Rule(match = "${match.rule}", priority = 0))
     public String postTopic6() {
         return "Hello dapr";
+    }
+
+    @POST
+    @Path("/cloudevent")
+    @Consumes(CloudEvent.CONTENT_TYPE)
+    public String postCloudEvent(CloudEvent<String> event) {
+        return event.getData();
     }
 }

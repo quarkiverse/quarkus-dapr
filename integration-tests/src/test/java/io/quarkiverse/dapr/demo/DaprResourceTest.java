@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
 
+import io.dapr.client.domain.CloudEvent;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
@@ -27,5 +28,33 @@ public class DaprResourceTest {
                 .then()
                 .statusCode(200)
                 .body(is(resp));
+    }
+
+    @Test
+    public void testCloudEventApplicationXml() {
+        String xml = "<note>hello</note>";
+        String body = "{\"id\":\"1\",\"source\":\"/tests\",\"specversion\":\"1.0\",\"type\":\"test\","
+                + "\"datacontenttype\":\"application/xml\",\"data\":\"" + xml + "\"}";
+        given()
+                .contentType(CloudEvent.CONTENT_TYPE)
+                .body(body)
+                .when().post("/dapr/cloudevent")
+                .then()
+                .statusCode(200)
+                .body(is(xml));
+    }
+
+    @Test
+    public void testCloudEventTextXmlWithCharset() {
+        String xml = "<note>hi</note>";
+        String body = "{\"id\":\"2\",\"source\":\"/tests\",\"specversion\":\"1.0\",\"type\":\"test\","
+                + "\"datacontenttype\":\"text/xml; charset=utf-8\",\"data\":\"" + xml + "\"}";
+        given()
+                .contentType(CloudEvent.CONTENT_TYPE)
+                .body(body)
+                .when().post("/dapr/cloudevent")
+                .then()
+                .statusCode(200)
+                .body(is(xml));
     }
 }
