@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.enterprise.inject.spi.CDI;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.NotSupportedException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
@@ -31,7 +32,7 @@ import io.quarkiverse.dapr.config.DaprConfig;
  * {@code Content-Type: application/cloudevents+json}.
  */
 @Provider
-@jakarta.ws.rs.Consumes(CloudEvent.CONTENT_TYPE)
+@Consumes(CloudEvent.CONTENT_TYPE)
 public class CloudEventDataReader implements MessageBodyReader<Object> {
 
     private static ObjectMapper OBJECT_MAPPER;

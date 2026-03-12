@@ -8,14 +8,14 @@ import jakarta.ws.rs.core.Response;
 
 import io.dapr.Topic;
 
-@Path("/webhook/orders")
-public class OrderWebhookResource {
+@Path("/webhook/orders-private")
+public class OrderPrivateCtorWebhookResource {
 
     public static class Order {
         public final String id;
         public final List<OrderItem> items;
 
-        Order(String id, List<OrderItem> items) {
+        private Order(String id, List<OrderItem> items) {
             this.id = id;
             this.items = items;
         }
@@ -34,7 +34,7 @@ public class OrderWebhookResource {
         public final String name;
         public final double price;
 
-        OrderItem(Long id, String name, double price) {
+        private OrderItem(Long id, String name, double price) {
             this.id = id;
             this.name = name;
             this.price = price;
