@@ -41,6 +41,7 @@ import io.quarkiverse.dapr.endpoint.dapr.DaprConfigHandler;
 import io.quarkiverse.dapr.endpoint.dapr.DaprSubscribeHandler;
 import io.quarkiverse.dapr.endpoint.health.DaprHealthzHandler;
 import io.quarkiverse.dapr.jackson.DaprJacksonModuleCustomizer;
+import io.quarkiverse.dapr.resteasy.CloudEventDataReader;
 import io.quarkiverse.dapr.resteasy.CloudEventReader;
 import io.quarkiverse.dapr.runtime.DaprProducer;
 import io.quarkiverse.dapr.runtime.DaprRuntimeRecorder;
@@ -117,6 +118,8 @@ public class DaprProcessor {
     void vertxProviders(BuildProducer<MessageBodyReaderBuildItem> providers) {
         providers.produce(new MessageBodyReaderBuildItem(CloudEventReader.class.getName(), CloudEvent.class.getName(),
                 Collections.singletonList(MediaType.APPLICATION_JSON)));
+        providers.produce(new MessageBodyReaderBuildItem(CloudEventDataReader.class.getName(), Object.class.getName(),
+                Collections.singletonList(CloudEvent.CONTENT_TYPE)));
     }
 
     @BuildStep
