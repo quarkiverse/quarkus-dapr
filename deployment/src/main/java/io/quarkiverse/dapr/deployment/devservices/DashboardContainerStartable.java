@@ -46,7 +46,7 @@ public class DashboardContainerStartable extends WorkflowDashboardContainer impl
         super.withStateStoreComponent(new Component(PGSQL_STATE_STORE, "state.postgresql", "v2", POSTGRE_SQL_DETAILS));
     }
 
-    public void configureWithPgsqlStateStore() {
-
+    public void setupStateStore(Component component) {
+        super.withStateStoreComponent(component);
     }
 }
