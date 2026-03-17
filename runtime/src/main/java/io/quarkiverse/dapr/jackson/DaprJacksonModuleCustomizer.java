@@ -7,7 +7,9 @@ import java.time.format.DateTimeFormatter;
 
 import jakarta.inject.Singleton;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -43,6 +45,9 @@ public class DaprJacksonModuleCustomizer implements ObjectMapperCustomizer {
 
         // null属性不序列化
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        // allow non-public record constructors (e.g., nested records)
+        objectMapper.setVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY);
 
         // 能解析注释符
         objectMapper.enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.mappedFeature());
