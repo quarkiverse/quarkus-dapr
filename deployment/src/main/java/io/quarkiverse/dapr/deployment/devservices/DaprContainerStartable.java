@@ -29,6 +29,7 @@ import org.yaml.snakeyaml.Yaml;
 import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.DaprContainer;
 import io.dapr.testcontainers.DaprLogLevel;
+import io.dapr.testcontainers.DaprProtocol;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.deployment.DaprProcessor;
 import io.quarkiverse.dapr.deployment.QuarkusPorts;
@@ -51,6 +52,8 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
 
         super.withAppName("local-dapr-app")
                 .withAppPort(QuarkusPorts.http(launchMode))
+                .withAppProtocol(DaprProtocol.HTTP)
+                .withAppHealthCheckPath("/healthz")
                 .withDaprLogLevel(DaprLogLevel.DEBUG)
                 .withNetwork(network)
                 .withAppChannelAddress("host.testcontainers.internal");
