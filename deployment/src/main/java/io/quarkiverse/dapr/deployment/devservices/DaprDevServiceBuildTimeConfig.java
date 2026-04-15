@@ -57,5 +57,13 @@ public interface DaprDevServiceBuildTimeConfig {
         @WithDefault("true")
         Optional<Boolean> enabled();
 
+        /**
+         * The value of the {@code quarkus-dev-service-dapr-dashboard} label attached to the started container.
+         * <p>
+         * This is used to discover and re-use an existing shared Dapr Dashboard container.
+         */
+        @WithDefault("dapr-dashboard")
+        String serviceName();
+
     }
 }
