@@ -1,5 +1,6 @@
 package io.quarkiverse.dapr.deployment;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.Index;
+import org.jboss.jandex.IndexView;
 
 import io.dapr.workflows.runtime.WorkflowRuntimeBuilder;
 import io.quarkiverse.dapr.config.DaprConfig;
@@ -25,23 +26,23 @@ import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
 import io.quarkus.deployment.annotations.ExecutionTime;
 import io.quarkus.deployment.annotations.Record;
-import io.quarkus.deployment.builditem.ApplicationIndexBuildItem;
+import io.quarkus.deployment.builditem.CombinedIndexBuildItem;
 import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.ShutdownContextBuildItem;
 
 public class DaprWorkflowProcessor {
 
     @BuildStep
-    public void searchWorkflows(ApplicationIndexBuildItem appIndex, BuildProducer<WorkflowItemBuildItem> workflowItems,
+    public void searchWorkflows(CombinedIndexBuildItem combinedIndex, BuildProducer<WorkflowItemBuildItem> workflowItems,
             DaprConfig config) {
 
         if (!config.workflow().enabled()) {
             return;
         }
 
-        Index index = appIndex.getIndex();
-        Set<ClassInfo> workflows = index.getAllKnownImplementors(DotNames.WORKFLOW_DOTNAME);
-        Set<ClassInfo> activities = index.getAllKnownImplementors(DotNames.WORKFLOW_ACTIVITY_DOTNAME);
+        IndexView index = combinedIndex.getIndex();
+        Collection<ClassInfo> workflows = index.getAllKnownImplementations(DotNames.WORKFLOW_DOTNAME);
+        Collection<ClassInfo> activities = index.getAllKnownImplementations(DotNames.WORKFLOW_ACTIVITY_DOTNAME);
 
         for (ClassInfo workflow : workflows) {
             String regName = null;
