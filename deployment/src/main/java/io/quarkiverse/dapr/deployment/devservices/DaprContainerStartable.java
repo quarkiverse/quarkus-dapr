@@ -6,6 +6,7 @@ import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStar
 import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.PGSQL_STATE_STORE;
 import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.POSTGRESQL_PORT;
 import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.USERNAME;
+import static io.quarkus.devservices.common.ConfigureUtil.configureSharedServiceLabel;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -54,6 +55,7 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
                 .withDaprLogLevel(DaprLogLevel.DEBUG)
                 .withNetwork(network)
                 .withAppChannelAddress("host.testcontainers.internal");
+        configureSharedServiceLabel(this, launchMode, DevServicesDaprProcessor.DEV_SERVICE_LABEL, config.serviceName());
 
         Testcontainers.exposeHostPorts(QuarkusPorts.http(launchMode),
                 QuarkusPorts.grpc(launchMode));

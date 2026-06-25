@@ -2,6 +2,7 @@ package io.quarkiverse.dapr.deployment.devservices;
 
 import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.PGSQL_NETWORK_ALIAS;
 import static io.quarkiverse.dapr.deployment.devservices.StateStoreContainerStartable.PGSQL_STATE_STORE;
+import static io.quarkus.devservices.common.ConfigureUtil.configureSharedServiceLabel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.DaprContainerConstants;
 import io.dapr.testcontainers.WorkflowDashboardContainer;
 import io.quarkus.deployment.builditem.Startable;
+import io.quarkus.runtime.LaunchMode;
 
 public class DashboardContainerStartable extends WorkflowDashboardContainer implements Startable {
 
@@ -20,10 +22,11 @@ public class DashboardContainerStartable extends WorkflowDashboardContainer impl
 
     private static final Map<String, String> POSTGRE_SQL_DETAILS = new HashMap<>();
 
-    public DashboardContainerStartable(Network network) {
+    public DashboardContainerStartable(Network network, LaunchMode launchMode, String serviceName) {
         super(DockerImageName.parse(DaprContainerConstants.DAPR_WORKFLOWS_DASHBOARD));
         super.withExposedPorts(INTERNAL_DAPR_DASHBOARD_WORKFLOW_PORT)
                 .withNetwork(network);
+        configureSharedServiceLabel(this, launchMode, DevServicesDaprProcessor.DASHBOARD_WORKFLOW_LABEL, serviceName);
     }
 
     @Override

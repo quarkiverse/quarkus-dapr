@@ -29,6 +29,22 @@ public interface DaprDevServiceBuildTimeConfig {
     String daprdImage();
 
     /**
+     * Indicates if the Dapr Dev Service should try to re-use a matching container.
+     * <p>
+     * This only applies in dev mode.
+     */
+    @WithDefault("true")
+    Optional<Boolean> shared();
+
+    /**
+     * The value of the {@code quarkus-dev-service-dapr} label attached to the started container.
+     * <p>
+     * This is used to discover and re-use an existing shared Dapr container.
+     */
+    @WithDefault("dapr")
+    String serviceName();
+
+    /**
      * Dapr Dashboard configuration
      */
     Dashboard dashboard();
@@ -40,6 +56,14 @@ public interface DaprDevServiceBuildTimeConfig {
          */
         @WithDefault("true")
         Optional<Boolean> enabled();
+
+        /**
+         * The value of the {@code quarkus-dev-service-dapr-dashboard} label attached to the started container.
+         * <p>
+         * This is used to discover and re-use an existing shared Dapr Dashboard container.
+         */
+        @WithDefault("dapr-dashboard")
+        String serviceName();
 
     }
 }
