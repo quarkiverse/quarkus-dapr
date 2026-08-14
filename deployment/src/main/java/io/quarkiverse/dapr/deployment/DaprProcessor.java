@@ -90,8 +90,12 @@ public class DaprProcessor {
             NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem) {
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprConfigHandler()));
 
+        routeBuildItemBuildProducer.produce(getDaprAppRouteBuildItem(new DaprConfigHandler()));
+
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprSubscribeHandler()));
+        routeBuildItemBuildProducer.produce(getDaprAppRouteBuildItem(new DaprSubscribeHandler()));
         routeBuildItemBuildProducer.produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new DaprHealthzHandler()));
+        routeBuildItemBuildProducer.produce(getDaprAppRouteBuildItem(new DaprHealthzHandler()));
     }
 
     @BuildStep
@@ -100,11 +104,19 @@ public class DaprProcessor {
         routeBuildItemBuildProducer
                 .produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new ActorDeactivateHandler()));
         routeBuildItemBuildProducer
+                .produce(getDaprAppRouteBuildItem(new ActorDeactivateHandler()));
+        routeBuildItemBuildProducer
                 .produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new ActorInvokeMethodHandler()));
+        routeBuildItemBuildProducer
+                .produce(getDaprAppRouteBuildItem(new ActorInvokeMethodHandler()));
         routeBuildItemBuildProducer
                 .produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new ActorInvokeTimerHandler()));
         routeBuildItemBuildProducer
+                .produce(getDaprAppRouteBuildItem(new ActorInvokeTimerHandler()));
+        routeBuildItemBuildProducer
                 .produce(getDaprRouteBuildItem(nonApplicationRootPathBuildItem, new ActorInvokeReminderHandler()));
+        routeBuildItemBuildProducer
+                .produce(getDaprAppRouteBuildItem(new ActorInvokeReminderHandler()));
     }
 
     @BuildStep
@@ -245,6 +257,21 @@ public class DaprProcessor {
             AbstractDaprHandler handler) {
         return nonApplicationRootPathBuildItem.routeBuilder()
                 .nestedRoute(handler.baseRoute(), handler.subRoute())
+                .handler(handler)
+                .displayOnNotFoundPage()
+                .build();
+    }
+
+    private RouteBuildItem getDaprAppRouteBuildItem(AbstractDaprHandler handler) {
+        String route = handler.baseRoute();
+        String subRoute = handler.subRoute();
+        if (StringUtils.isNotBlank(subRoute)) {
+            route = route + "/" + subRoute;
+        }
+        route = route.replaceAll("//", "/");
+
+        return RouteBuildItem.builder()
+                .route(route)
                 .handler(handler)
                 .displayOnNotFoundPage()
                 .build();

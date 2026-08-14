@@ -1,0 +1,48 @@
+package io.quarkiverse.dapr.demo;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.is;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
+
+@QuarkusTest
+public class DaprSubscribeAndHealthTest {
+
+    private static final String SUBSCRIBE_RESPONSE = "[{\"pubsubName\":\"pubsub.six\",\"topic\":\"topic-6\",\"routes\":{\"rules\":[{\"match\":\"event.type='found'\",\"path\":\"/dapr/topic6\"}]},\"metadata\":{}},{\"pubsubName\":\"pubsub\",\"topic\":\"topic-5\",\"route\":\"/dapr/topic5\",\"metadata\":{}},{\"pubsubName\":\"messagebus\",\"topic\":\"topic-4\",\"route\":\"/dapr/topic4\",\"metadata\":{\"test\":\"aaa\"}},{\"pubsubName\":\"messagebus\",\"topic\":\"test-topic2\",\"route\":\"/dapr\",\"metadata\":{\"test\":\"aaa\"}},{\"pubsubName\":\"messagebus\",\"topic\":\"test-topic3\",\"route\":\"/dapr/topic3\",\"metadata\":{\"test\":\"aaa\"}}]";
+
+    @Test
+    public void testSubscribeEndpointOnApplicationRoot() {
+        given()
+                .when().get("/dapr/subscribe")
+                .then()
+                .statusCode(200)
+                .body(is(SUBSCRIBE_RESPONSE));
+    }
+
+    @Test
+    public void testSubscribeEndpointOnNonApplicationRoot() {
+        given()
+                .when().get("/q/dapr/subscribe")
+                .then()
+                .statusCode(200)
+                .body(is(SUBSCRIBE_RESPONSE));
+    }
+
+    @Test
+    public void testHealthzEndpointOnApplicationRoot() {
+        given()
+                .when().get("/healthz")
+                .then()
+                .statusCode(200);
+    }
+
+    @Test
+    public void testHealthzEndpointOnNonApplicationRoot() {
+        given()
+                .when().get("/q/healthz")
+                .then()
+                .statusCode(200);
+    }
+}
