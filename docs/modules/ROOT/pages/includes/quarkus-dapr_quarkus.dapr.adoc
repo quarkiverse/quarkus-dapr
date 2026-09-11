@@ -7,7 +7,7 @@ h|[.header-title]##Configuration property##
 h|Type
 h|Default
 
-a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-devservices-enabled]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-devservices-enabled[`quarkus.dapr.devservices.enabled`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-devservices-enabled]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-devservices-enabled[`+++quarkus.dapr.devservices.enabled+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.devservices.enabled+++[]
 endif::add-copy-button-to-config-props[]
@@ -30,7 +30,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-devservices-daprd-image]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-devservices-daprd-image[`quarkus.dapr.devservices.daprd-image`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-devservices-daprd-image]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-devservices-daprd-image[`+++quarkus.dapr.devservices.daprd-image+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.devservices.daprd-image+++[]
 endif::add-copy-button-to-config-props[]
@@ -49,9 +49,9 @@ Environment variable: `+++QUARKUS_DAPR_DEVSERVICES_DAPRD_IMAGE+++`
 endif::add-copy-button-to-env-var[]
 --
 |string
-|`+++daprio/daprd:1.17.0+++`
+|`+++daprio/daprd:1.18.0+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-devservices-dashboard-enabled]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-devservices-dashboard-enabled[`quarkus.dapr.devservices.dashboard.enabled`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-devservices-dashboard-enabled]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-devservices-dashboard-enabled[`+++quarkus.dapr.devservices.dashboard.enabled+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.devservices.dashboard.enabled+++[]
 endif::add-copy-button-to-config-props[]
@@ -72,7 +72,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-default-pub-sub]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-default-pub-sub[`quarkus.dapr.default-pub-sub`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-default-pub-sub]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-default-pub-sub[`+++quarkus.dapr.default-pub-sub+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.default-pub-sub+++[]
 endif::add-copy-button-to-config-props[]
@@ -93,7 +93,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++redis+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-workflow-enabled]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-workflow-enabled[`quarkus.dapr.workflow.enabled`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-workflow-enabled]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-workflow-enabled[`+++quarkus.dapr.workflow.enabled+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.workflow.enabled+++[]
 endif::add-copy-button-to-config-props[]
@@ -114,7 +114,7 @@ endif::add-copy-button-to-env-var[]
 |boolean
 |`+++true+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-type]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-type[`quarkus.dapr.pub-sub."pub-sub".type`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-type]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-type[`+++quarkus.dapr.pub-sub."pub-sub".type+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.pub-sub."pub-sub".type+++[]
 endif::add-copy-button-to-config-props[]
@@ -135,7 +135,7 @@ endif::add-copy-button-to-env-var[]
 |string
 |`+++redis+++`
 
-a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-publish-metadata-publish-metadata]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-publish-metadata-publish-metadata[`quarkus.dapr.pub-sub."pub-sub".publish-metadata."publish-metadata"`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-publish-metadata-publish-metadata]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-publish-metadata-publish-metadata[`+++quarkus.dapr.pub-sub."pub-sub".publish-metadata."publish-metadata"+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.pub-sub."pub-sub".publish-metadata."publish-metadata"+++[]
 endif::add-copy-button-to-config-props[]
@@ -156,7 +156,7 @@ endif::add-copy-button-to-env-var[]
 |Map<String,String>
 |
 
-a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-consume-metadata-consume-metadata]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-consume-metadata-consume-metadata[`quarkus.dapr.pub-sub."pub-sub".consume-metadata."consume-metadata"`]##
+a|icon:lock[title=Fixed at build time] [[quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-consume-metadata-consume-metadata]] [.property-path]##link:#quarkus-dapr_quarkus-dapr-pub-sub-pub-sub-consume-metadata-consume-metadata[`+++quarkus.dapr.pub-sub."pub-sub".consume-metadata."consume-metadata"+++`]##
 ifdef::add-copy-button-to-config-props[]
 config_property_copy_button:+++quarkus.dapr.pub-sub."pub-sub".consume-metadata."consume-metadata"+++[]
 endif::add-copy-button-to-config-props[]
