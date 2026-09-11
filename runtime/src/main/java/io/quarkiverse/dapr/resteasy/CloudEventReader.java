@@ -14,8 +14,11 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.Provider;
+
+import org.jboss.resteasy.reactive.server.spi.ResteasyReactiveResourceInfo;
+import org.jboss.resteasy.reactive.server.spi.ServerMessageBodyReader;
+import org.jboss.resteasy.reactive.server.spi.ServerRequestContext;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,13 +29,18 @@ import io.quarkiverse.dapr.config.DaprConfig;
 
 /**
  * CloudEventReader
+ * <p>
+ * Implements {@link ServerMessageBodyReader} so that RESTEasy Reactive does not need to reflectively look up the
+ * resource method to obtain parameter annotations. A plain {@code MessageBodyReader} triggers
+ * {@code Class.getMethod(...)} at request time, which fails in native mode because resource methods that only take a
+ * {@code CloudEvent} parameter are not registered for reflection.
  *
  * @author naah69
  * @date 2022/4/25 10:04 AM
  */
 @Provider
 @Produces(CloudEvent.CONTENT_TYPE)
-public class CloudEventReader implements MessageBodyReader<CloudEvent> {
+public class CloudEventReader implements ServerMessageBodyReader<CloudEvent> {
 
     private static ObjectMapper OBJECT_MAPPER;
     private static DaprConfig DAPR_CONFIG;
@@ -48,19 +56,34 @@ public class CloudEventReader implements MessageBodyReader<CloudEvent> {
     }
 
     @Override
+    public boolean isReadable(Class<?> type, Type genericType, ResteasyReactiveResourceInfo lazyMethod,
+            MediaType mediaType) {
+        return type == CloudEvent.class;
+    }
+
+    @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type == CloudEvent.class;
+    }
+
+    @Override
+    public CloudEvent readFrom(Class<CloudEvent> type, Type genericType, MediaType mediaType,
+            ServerRequestContext context) throws WebApplicationException, IOException {
+        return read(genericType, context.getInputStream());
     }
 
     @Override
     public CloudEvent readFrom(Class<CloudEvent> type, Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
             throws IOException, WebApplicationException {
+        return read(genericType, entityStream);
+    }
+
+    private static CloudEvent read(Type genericType, InputStream entityStream) throws IOException {
         JavaType valueType = TYPE_CACHE.computeIfAbsent(genericType,
                 a -> OBJECT_MAPPER.getTypeFactory().constructType(genericType));
         JsonNode jsonNode = OBJECT_MAPPER.readTree(entityStream);
         return getCloudEvent(jsonNode, valueType);
-
     }
 
     private static CloudEvent getCloudEvent(JsonNode jsonNode, JavaType valueType)

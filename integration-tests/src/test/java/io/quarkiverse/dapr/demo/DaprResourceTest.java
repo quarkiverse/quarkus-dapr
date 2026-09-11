@@ -57,4 +57,18 @@ public class DaprResourceTest {
                 .statusCode(200)
                 .body(is(xml));
     }
+
+    @Test
+    public void testCloudEventTextPlain() {
+        String text = "hello dapr";
+        String body = "{\"id\":\"3\",\"source\":\"/tests\",\"specversion\":\"1.0\",\"type\":\"test\","
+                + "\"datacontenttype\":\"text/plain\",\"data\":\"" + text + "\"}";
+        given()
+                .contentType(CloudEvent.CONTENT_TYPE)
+                .body(body)
+                .when().post("/dapr/cloudevent")
+                .then()
+                .statusCode(200)
+                .body(is(text));
+    }
 }
