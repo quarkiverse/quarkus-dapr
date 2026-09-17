@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import io.quarkiverse.dapr.devui.DaprComponent;
 import io.quarkiverse.dapr.devui.DaprDashboardRPCService;
 import io.quarkus.test.QuarkusUnitTest;
 
@@ -20,9 +21,8 @@ public class DaprComponentDiscoveryTest {
     static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
             .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
                     .addClass(DaprDashboardRPCService.class)
-                    .addClass(DaprDashboardRPCService.DTOComponent.class)
                     .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")
-                    .addAsResource("components/statestore.yaml", "components/statestore.yaml"))
+                    .addAsResource("test-components/statestore.yaml", "components/statestore.yaml"))
             .overrideConfigKey("quarkus.dapr.devservices.enabled", "false");
 
     @Inject
@@ -30,11 +30,15 @@ public class DaprComponentDiscoveryTest {
 
     @Test
     public void testComponentDiscovery() {
-        List<DaprDashboardRPCService.DTOComponent> components = rpcService.getComponents();
-        Assertions.assertNotNull(components);
-        Assertions.assertFalse(components.isEmpty(), "Components list should not be empty");
+        List<DaprComponent> components = rpcService.getComponents();
+        Assertions.assertEquals(1, components.size(), "Exactly one component should be discovered");
 
-        boolean found = components.stream().anyMatch(c -> "statestore".equals(c.name) && "state.redis".equals(c.type));
-        Assertions.assertTrue(found, "Discovered components should include 'statestore' of type 'state.redis'");
+        DaprComponent component = components.get(0);
+        Assertions.assertEquals("statestore", component.getName());
+        Assertions.assertEquals("state.redis", component.getType());
+        Assertions.assertEquals("v1", component.getVersion());
+        Assertions.assertEquals("localhost:6379", component.getMetadata().get("redisHost"));
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> components.add(component),
+                "Components list should be immutable");
     }
 }

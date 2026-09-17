@@ -19,6 +19,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
@@ -28,9 +30,12 @@ import io.dapr.config.Properties;
 import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.deployment.items.DaprComponentBuildItem;
+import io.quarkiverse.dapr.devui.DaprComponent;
 import io.quarkiverse.dapr.devui.DaprDashboardRPCService;
 import io.quarkiverse.dapr.devui.DaprDashboardRecorder;
+import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.arc.processor.BuiltinScope;
+import io.quarkus.deployment.IsLocalDevelopment;
 import io.quarkus.deployment.IsProduction;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -53,6 +58,7 @@ public class DevServicesDaprProcessor {
     private static final String STATESTORE_PG = QUARKUS_DAPR_SERVICE_NAME_PREFIX + "statestore-pgsql";
     private static final String POSTGRESQL_PORT_PROPERTY = "quarkus.dapr.devservices.dashboard.pgsql.port";
     private static final String COMPONENTS_DIR = "components";
+    private static final String PGSQL_STATE_STORE_TYPE = "state.postgresql";
 
     @BuildStep
     public CardPageBuildItem cardPage() {
@@ -65,22 +71,23 @@ public class DevServicesDaprProcessor {
         return cardPageBuildItem;
     }
 
-    @BuildStep(onlyIfNot = IsProduction.class)
+    @BuildStep(onlyIf = IsLocalDevelopment.class)
     public JsonRPCProvidersBuildItem dashboardWorkflow() {
         return new JsonRPCProvidersBuildItem(DaprDashboardRPCService.class, BuiltinScope.SINGLETON.getName());
     }
 
-    @Record(ExecutionTime.RUNTIME_INIT)
+    @Record(ExecutionTime.STATIC_INIT)
     @BuildStep(onlyIfNot = IsProduction.class)
-    void setupRPCComponents(DaprDashboardRecorder recorder, List<DaprComponentBuildItem> componentBuildItems) {
-        List<DaprDashboardRPCService.DTOComponent> dtos = componentBuildItems.stream()
-                .map(item -> new DaprDashboardRPCService.DTOComponent(
-                        item.getName(),
-                        item.getType(),
-                        item.getVersion(),
-                        item.getMetadata()))
-                .collect(Collectors.toList());
-        recorder.setComponents(dtos);
+    void daprComponentBeans(DaprDashboardRecorder recorder, List<DaprComponentBuildItem> componentBuildItems,
+            BuildProducer<SyntheticBeanBuildItem> syntheticBeans) {
+        for (DaprComponentBuildItem item : componentBuildItems) {
+            syntheticBeans.produce(SyntheticBeanBuildItem.configure(DaprComponent.class)
+                    .scope(Singleton.class)
+                    .identifier(item.getName())
+                    .supplier(recorder.component(item.getName(), item.getType(), item.getVersion(), item.getMetadata()))
+                    .unremovable()
+                    .done());
+        }
     }
 
     @BuildStep
@@ -181,23 +188,20 @@ public class DevServicesDaprProcessor {
         Network.NetworkImpl network = Network.builder()
                 .build();
 
+        boolean dashboardEnabled = config.dashboard().enabled().get();
+        Optional<Component> declaredStateStore = dashboardEnabled
+                ? components.stream().filter(c -> PGSQL_STATE_STORE_TYPE.equals(c.getType())).findFirst()
+                : Optional.empty();
+        // the pgsql dev service is only needed when the user did not declare a postgresql state store
+        boolean startPgsql = dashboardEnabled && declaredStateStore.isEmpty();
+
         List<DevServicesResultBuildItem> containers = new ArrayList<>();
-        DevServicesResultBuildItem dapr = configureDaprContainer(config, launchMode, network, components);
-        containers.add(dapr);
+        containers.add(configureDaprContainer(config, launchMode, network, components, startPgsql));
 
-        if (config.dashboard().enabled().get()) {
-            Optional<Component> dbComponent = components.stream()
-                    .filter(c -> "state.postgresql".equals(c.getType()))
-                    .findFirst();
-
-            if (dbComponent.isPresent()) {
-                DevServicesResultBuildItem dashboard = configureDashboardWorkflowContainer(network, dbComponent);
-                containers.add(dashboard);
-            } else {
-                DevServicesResultBuildItem pgsql = configurePgsqlContainer(network);
-                DevServicesResultBuildItem dashboard = configureDashboardWorkflowContainer(network, Optional.empty());
-                containers.add(dashboard);
-                containers.add(pgsql);
+        if (dashboardEnabled) {
+            containers.add(configureDashboardWorkflowContainer(network, declaredStateStore));
+            if (startPgsql) {
+                containers.add(configurePgsqlContainer(network));
             }
         }
 
@@ -205,7 +209,7 @@ public class DevServicesDaprProcessor {
     }
 
     private static DevServicesResultBuildItem configureDaprContainer(DaprDevServiceBuildTimeConfig config,
-            LaunchModeBuildItem launchMode, Network network, List<Component> components) {
+            LaunchModeBuildItem launchMode, Network network, List<Component> components, boolean usePgsqlDevService) {
         DevServicesResultBuildItem.OwnedServiceBuilder<Startable> builder = DevServicesResultBuildItem.owned()
                 .serviceName(FEATURE)
                 .feature(FEATURE)
@@ -213,11 +217,11 @@ public class DevServicesDaprProcessor {
                     @Override
                     public Startable get() {
                         return new DaprContainerStartable(config,
-                                launchMode.getLaunchMode(), network, components);
+                                launchMode.getLaunchMode(), network, components, usePgsqlDevService);
                     }
                 });
 
-        if (config.dashboard().enabled().get()) {
+        if (usePgsqlDevService) {
             builder.dependsOnConfig(POSTGRESQL_PORT_PROPERTY, (startable, value) -> {
                 LOGGER.info("Dapr statestore {} is running", PGSQL_STATE_STORE);
             });
@@ -233,31 +237,33 @@ public class DevServicesDaprProcessor {
     }
 
     private static DevServicesResultBuildItem configureDashboardWorkflowContainer(Network network,
-            Optional<Component> dbComponent) {
-        DevServicesResultBuildItem dashboard = DevServicesResultBuildItem.owned()
+            Optional<Component> declaredStateStore) {
+        DevServicesResultBuildItem.OwnedServiceBuilder<Startable> builder = DevServicesResultBuildItem.owned()
                 .serviceName(DASHBOARD_WORKFLOW)
                 .feature(FEATURE)
                 .startable(new Supplier<Startable>() {
                     @Override
                     public Startable get() {
                         DashboardContainerStartable container = new DashboardContainerStartable(network);
-                        dbComponent.ifPresent(container::setupStateStore);
+                        declaredStateStore.ifPresent(container::setupStateStore);
                         return container;
                     }
-                })
-                .dependsOnConfig(POSTGRESQL_PORT_PROPERTY, (Startable startable, String value) -> {
-                    if (dbComponent.isEmpty()) {
-                        LOGGER.info("Running dependsOnConfig for DashboardContainerStartable container");
-                        DashboardContainerStartable d = (DashboardContainerStartable) startable;
-                        d.setupStateStore();
-                    }
-                })
+                });
+
+        if (declaredStateStore.isEmpty()) {
+            builder.dependsOnConfig(POSTGRESQL_PORT_PROPERTY, (Startable startable, String value) -> {
+                LOGGER.info("Running dependsOnConfig for DashboardContainerStartable container");
+                DashboardContainerStartable d = (DashboardContainerStartable) startable;
+                d.setupStateStore();
+            });
+        }
+
+        return builder
                 .configProvider(Map.of(DAPR_DASHBOARD_WORKFLOW_URL, startable -> {
                     DashboardContainerStartable container = (DashboardContainerStartable) startable;
                     return "http://127.0.0.1:" + container.getMappedPort(INTERNAL_DAPR_DASHBOARD_WORKFLOW_PORT);
                 }))
                 .build();
-        return dashboard;
     }
 
     private static DevServicesResultBuildItem configurePgsqlContainer(Network network) {

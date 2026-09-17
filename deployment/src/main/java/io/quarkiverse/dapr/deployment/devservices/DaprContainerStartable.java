@@ -27,13 +27,15 @@ import io.quarkus.runtime.LaunchMode;
 public class DaprContainerStartable extends DaprContainer implements Startable {
 
     private final DaprDevServiceBuildTimeConfig config;
+    private final boolean usePgsqlDevService;
 
     public DaprContainerStartable(DaprDevServiceBuildTimeConfig config, LaunchMode launchMode, Network network,
-            List<Component> components) {
+            List<Component> components, boolean usePgsqlDevService) {
         super(DockerImageName.parse(config.daprdImage()).asCompatibleSubstituteFor(
                 DAPR_RUNTIME_IMAGE_TAG));
 
         this.config = config;
+        this.usePgsqlDevService = usePgsqlDevService;
 
         super.withAppName("local-dapr-app")
                 .withAppPort(QuarkusPorts.http(launchMode))
@@ -65,7 +67,8 @@ public class DaprContainerStartable extends DaprContainer implements Startable {
             // use in-memory
             super.withComponent(new Component("kvstore", "state.in-memory", "v1",
                     Collections.singletonMap("actorStateStore", String.valueOf(true))));
-        } else {
+        } else if (usePgsqlDevService) {
+            // otherwise the user declared its own postgresql state store component
             configureWithPgsqlStateStore();
         }
 

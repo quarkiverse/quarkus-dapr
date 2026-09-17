@@ -9,6 +9,10 @@ import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkus.builder.item.MultiBuildItem;
 
+/**
+ * Represents a Dapr component declared in the {@code components} directory of the classpath.
+ * One build item is produced for each discovered component.
+ */
 public final class DaprComponentBuildItem extends MultiBuildItem {
 
     private final String name;
@@ -20,7 +24,7 @@ public final class DaprComponentBuildItem extends MultiBuildItem {
         this.name = name;
         this.type = type;
         this.version = version;
-        this.metadata = metadata == null ? Collections.emptyMap() : metadata;
+        this.metadata = metadata == null ? Collections.emptyMap() : Collections.unmodifiableMap(metadata);
     }
 
     public String getName() {

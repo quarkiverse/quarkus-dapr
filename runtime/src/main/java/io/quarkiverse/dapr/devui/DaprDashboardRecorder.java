@@ -1,17 +1,14 @@
 package io.quarkiverse.dapr.devui;
 
-import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import io.quarkus.arc.Arc;
 import io.quarkus.runtime.annotations.Recorder;
 
 @Recorder
 public class DaprDashboardRecorder {
 
-    public void setComponents(List<DaprDashboardRPCService.DTOComponent> components) {
-        DaprDashboardRPCService service = Arc.container().instance(DaprDashboardRPCService.class).get();
-        if (service != null) {
-            service.setComponents(components);
-        }
+    public Supplier<DaprComponent> component(String name, String type, String version, Map<String, String> metadata) {
+        return () -> new DaprComponent(name, type, version, metadata);
     }
 }
