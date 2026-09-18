@@ -181,3 +181,8 @@ spec:
 ----
 
 Quarkus Dapr automatically detects these files and configures the Dapr sidecar with the provided components during application startup.
+
+[NOTE]
+====
+If you declare a `state.postgresql` component and the Dapr Dashboard is enabled, Dev Services will not start its own PostgreSQL container: the Dapr sidecar and the Dashboard use your component instead.
+====
