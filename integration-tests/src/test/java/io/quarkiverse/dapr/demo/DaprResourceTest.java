@@ -6,13 +6,24 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MediaType;
+
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.dapr.client.domain.CloudEvent;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class DaprResourceTest {
+
+    @Inject
+    ObjectMapper objectMapper;
 
     @Test
     public void testHelloEndpoint() {
@@ -49,25 +60,10 @@ public class DaprResourceTest {
     }
 
     @Test
-    public void testCloudEventUnwrapsDataIntoPojo() {
-        String event = "{"
-                + "\"data\":{"
-                + "\"id\":\"fa985994-78ce-4013-9029-81dad4787a4a\","
-                + "\"items\":[{\"id\":1,\"name\":\"Quarkus Stickers\",\"price\":19.99}]"
-                + "},"
-                + "\"datacontenttype\":\"application/json\","
-                + "\"id\":\"10e48bf4-bc1b-4b0a-9d76-02dc9e095f55\","
-                + "\"pubsubname\":\"rabbitmq\","
-                + "\"source\":\"orders-api\","
-                + "\"specversion\":\"1.0\","
-                + "\"time\":\"2025-10-06T20:47:45Z\","
-                + "\"topic\":\"order.created\","
-                + "\"type\":\"com.dapr.event.sent\""
-                + "}";
-
+    public void testCloudEventUnwrapsDataIntoPojo() throws Exception {
         given()
                 .contentType(CloudEvent.CONTENT_TYPE)
-                .body(event)
+                .body(objectMapper.writeValueAsString(orderCreatedEvent()))
                 .when().post("/webhook/orders")
                 .then()
                 .statusCode(200)
@@ -75,29 +71,31 @@ public class DaprResourceTest {
     }
 
     @Test
-    public void testCloudEventUnwrapsDataIntoPojoWithNonPublicCtors() {
-        String event = "{"
-                + "\"data\":{"
-                + "\"id\":\"fa985994-78ce-4013-9029-81dad4787a4a\","
-                + "\"items\":[{\"id\":1,\"name\":\"Quarkus Stickers\",\"price\":19.99}]"
-                + "},"
-                + "\"datacontenttype\":\"application/json\","
-                + "\"id\":\"10e48bf4-bc1b-4b0a-9d76-02dc9e095f55\","
-                + "\"pubsubname\":\"rabbitmq\","
-                + "\"source\":\"orders-api\","
-                + "\"specversion\":\"1.0\","
-                + "\"time\":\"2025-10-06T20:47:45Z\","
-                + "\"topic\":\"order.created\","
-                + "\"type\":\"com.dapr.event.sent\""
-                + "}";
-
+    public void testCloudEventUnwrapsDataIntoPojoWithNonPublicCtors() throws Exception {
         given()
                 .contentType(CloudEvent.CONTENT_TYPE)
-                .body(event)
+                .body(objectMapper.writeValueAsString(orderCreatedEvent()))
                 .when().post("/webhook/orders-private")
                 .then()
                 .statusCode(200)
                 .body(is("1"));
+    }
+
+    private static CloudEvent<OrderWebhookResource.Order> orderCreatedEvent() {
+        OrderWebhookResource.Order order = new OrderWebhookResource.Order("fa985994-78ce-4013-9029-81dad4787a4a",
+                List.of(new OrderItem(1L, "Quarkus Stickers", 19.99)));
+
+        CloudEvent<OrderWebhookResource.Order> event = new CloudEvent<>(
+                "10e48bf4-bc1b-4b0a-9d76-02dc9e095f55",
+                "orders-api",
+                "com.dapr.event.sent",
+                "1.0",
+                MediaType.APPLICATION_JSON,
+                order);
+        event.setPubsubName("rabbitmq");
+        event.setTopic("order.created");
+        event.setTime(OffsetDateTime.parse("2025-10-06T20:47:45Z"));
+        return event;
     }
 
     @Test

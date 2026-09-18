@@ -29,30 +29,6 @@ public class OrderWebhookResource {
         }
     }
 
-    public static class OrderItem {
-        public final Long id;
-        public final String name;
-        public final double price;
-
-        OrderItem(Long id, String name, double price) {
-            this.id = id;
-            this.name = name;
-            this.price = price;
-        }
-
-        public Long id() {
-            return id;
-        }
-
-        public String name() {
-            return name;
-        }
-
-        public double price() {
-            return price;
-        }
-    }
-
     @POST
     @Topic(pubsubName = "rabbitmq", name = "order.created")
     public Response consume(Order order) {

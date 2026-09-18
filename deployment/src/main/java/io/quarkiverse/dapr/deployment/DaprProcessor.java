@@ -112,6 +112,7 @@ public class DaprProcessor {
     void additionalBeans(BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         additionalBeans.produce(AdditionalBeanBuildItem.unremovableOf(DaprProducer.class));
         additionalBeans.produce(AdditionalBeanBuildItem.unremovableOf(DaprJacksonModuleCustomizer.class));
+        additionalBeans.produce(AdditionalBeanBuildItem.unremovableOf(CloudEventDataReader.class));
     }
 
     @BuildStep

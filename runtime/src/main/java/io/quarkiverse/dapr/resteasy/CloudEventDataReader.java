@@ -9,7 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import jakarta.enterprise.inject.spi.CDI;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.NotSupportedException;
 import jakarta.ws.rs.WebApplicationException;
@@ -28,24 +29,22 @@ import io.quarkiverse.dapr.config.DaprConfig;
 /**
  * Reads a Dapr CloudEvent and deserializes its {@code data} into the requested JAX-RS parameter type.
  *
- * This allows resource methods to work when Dapr sends to work when Dapr sends
+ * This allows resource methods to work when Dapr sends
  * {@code Content-Type: application/cloudevents+json}.
  */
+@Singleton
 @Provider
 @Consumes(CloudEvent.CONTENT_TYPE)
 public class CloudEventDataReader implements MessageBodyReader<Object> {
 
-    private static ObjectMapper OBJECT_MAPPER;
-    private static DaprConfig DAPR_CONFIG;
-    private static final Map<Type, JavaType> TYPE_CACHE = new ConcurrentHashMap<>();
+    private final ObjectMapper objectMapper;
+    private final DaprConfig daprConfig;
+    private final Map<Type, JavaType> typeCache = new ConcurrentHashMap<>();
 
-    public CloudEventDataReader() {
-        if (OBJECT_MAPPER == null) {
-            OBJECT_MAPPER = CDI.current().select(ObjectMapper.class).get();
-        }
-        if (DAPR_CONFIG == null) {
-            DAPR_CONFIG = CDI.current().select(DaprConfig.class).get();
-        }
+    @Inject
+    public CloudEventDataReader(ObjectMapper objectMapper, DaprConfig daprConfig) {
+        this.objectMapper = objectMapper;
+        this.daprConfig = daprConfig;
     }
 
     @Override
@@ -57,15 +56,15 @@ public class CloudEventDataReader implements MessageBodyReader<Object> {
     @Override
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
-        JavaType targetType = TYPE_CACHE.computeIfAbsent(genericType,
-                a -> OBJECT_MAPPER.getTypeFactory().constructType(genericType));
+        JavaType targetType = typeCache.computeIfAbsent(genericType,
+                a -> objectMapper.getTypeFactory().constructType(genericType));
 
-        JsonNode cloudEventNode = OBJECT_MAPPER.readTree(entityStream);
+        JsonNode cloudEventNode = objectMapper.readTree(entityStream);
         JsonNode dataNode = cloudEventNode.get("data");
         JsonNode base64Node = cloudEventNode.get("data_base64");
 
         if (dataNode == null && base64Node == null) {
-            return OBJECT_MAPPER.treeToValue(cloudEventNode, targetType);
+            return objectMapper.treeToValue(cloudEventNode, targetType);
         }
 
         String dataContentType = Optional.ofNullable(cloudEventNode.get("datacontenttype"))
@@ -78,7 +77,7 @@ public class CloudEventDataReader implements MessageBodyReader<Object> {
                 if (dataNode == null || dataNode.isNull()) {
                     return null;
                 }
-                return OBJECT_MAPPER.treeToValue(dataNode, targetType);
+                return objectMapper.treeToValue(dataNode, targetType);
             case MediaType.TEXT_PLAIN:
                 if (dataNode == null || dataNode.isNull()) {
                     return null;
@@ -87,7 +86,7 @@ public class CloudEventDataReader implements MessageBodyReader<Object> {
                 if (Objects.equals(String.class, targetType.getRawClass())) {
                     return dataText;
                 }
-                return OBJECT_MAPPER.readValue(dataText, targetType);
+                return objectMapper.readValue(dataText, targetType);
             case MediaType.APPLICATION_OCTET_STREAM:
                 if (base64Node == null || base64Node.isNull()) {
                     return null;
@@ -99,15 +98,15 @@ public class CloudEventDataReader implements MessageBodyReader<Object> {
                 String pubsubname = Optional.ofNullable(cloudEventNode.get("pubsubname"))
                         .map(JsonNode::asText)
                         .orElse("");
-                String rawPayload = Optional.ofNullable(DAPR_CONFIG.pubSub().get(pubsubname))
+                String rawPayload = Optional.ofNullable(daprConfig.pubSub().get(pubsubname))
                         .map(a -> a.consumeMetadata())
                         .map(a -> a.get("rawPayload"))
                         .orElse("");
                 if (Objects.equals("true", rawPayload)) {
-                    JsonNode payloadNode = OBJECT_MAPPER.readTree(binaryData);
-                    return OBJECT_MAPPER.treeToValue(payloadNode, targetType);
+                    JsonNode payloadNode = objectMapper.readTree(binaryData);
+                    return objectMapper.treeToValue(payloadNode, targetType);
                 }
-                return OBJECT_MAPPER.readValue(binaryData, targetType);
+                return objectMapper.readValue(binaryData, targetType);
             default:
                 throw new NotSupportedException("can't read unknown cloud event content type: " + dataContentType);
         }
