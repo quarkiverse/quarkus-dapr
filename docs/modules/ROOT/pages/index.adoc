@@ -77,6 +77,43 @@ In the attributes `name`, `pubsubName`, and `match` of the `@Topic` annotation, 
 public String eventOnTopic6(String content) {......}
 ----
 
+=== service invocation
+
+Instead of calling `DaprClient#invokeMethod` directly, you can declare an interface annotated with `@RegisterDaprInvokeClient`
+and inject it with the `@DaprInvokeClient` qualifier (`@Inject` is optional):
+
+[source,java]
+----
+@Path("/orders")
+@RegisterDaprInvokeClient(appId = "order-service")
+public interface OrderService {
+
+    @GET
+    @Path("/{id}")
+    Order getById(@PathParam("id") String id, @QueryParam("expand") String expand);
+
+    @POST
+    Uni<Order> create(Order order);
+}
+
+@ApplicationScoped
+public class OrderResource {
+
+    @DaprInvokeClient
+    OrderService orderService;
+}
+----
+
+The methods are mapped using the Jakarta REST annotations:
+
+* `@Path` on the interface and on the method defines the invoked method name (e.g. `orders/1`).
+* `@GET`, `@POST`, `@PUT`, `@DELETE`, ... define the HTTP verb; `POST` is used when none is present.
+* `@PathParam`, `@QueryParam` and `@HeaderParam` are applied to the request.
+* A single non-annotated parameter is sent as the request body.
+* The return type can be a plain type (blocking call), `void`, `Mono<T>`, `Uni<T>` or `CompletionStage<T>`.
+
+The `appId` attribute can reference a config property, e.g. `@RegisterDaprInvokeClient(appId = "${order-service.app-id}")`.
+
 
 For more details and hands-on experiences, please reference to our link:https://github.com/quarkiverse/quarkus-dapr/blob/main/demo/README.md[Demo].
 
