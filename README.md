@@ -64,7 +64,7 @@ To publish events to your message broker, just inject a dapr client to your bean
     @Inject
     SyncDaprClient dapr;
 
-    dapr.publishEvent("messagebus", "topic1", content.getBytes(StandardCharsets.UTF_8), new HashMap<>());
+    dapr.publishEvent("messagebus", "topic1", "Hello from Quarkus!");
 ```
 
 To subscribe events for your message broker, adding some annotations on your method is enough:
@@ -73,7 +73,10 @@ To subscribe events for your message broker, adding some annotations on your met
 @POST
 @Path("/topic1")
 @Topic(name = "topic1", pubsubName = "messagebus")
-public String eventOnTopic2(String content) {......}
+public void eventOnTopic1(CloudEvent<String> event) {
+    String content = event.getData();
+    // ...
+}
 ```
 
 For more details and hands-on experiences, please reference to our [Demo](./demo/README.md).
