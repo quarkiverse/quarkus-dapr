@@ -78,7 +78,7 @@ public void eventOnTopic1(CloudEvent<String> event) {
 }
 ----
 
-The payload can also be a custom type, which is deserialized from the event data:
+This extension supports `CloudEvent` as the event type, with any payload type:
 
 [source,java]
 ----
@@ -91,8 +91,7 @@ public void eventOnTopic2(CloudEvent<MyData> event) {
 }
 ----
 
-If you only need the payload, declare the parameter with the payload type directly and the extension extracts it
-from the event data for you:
+The parameter can also be a custom type, which is deserialized from the event data:
 
 [source,java]
 ----
