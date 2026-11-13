@@ -142,13 +142,17 @@ public class OrderResource {
 }
 ----
 
-The methods are mapped using the Jakarta REST annotations:
+The interface is a regular https://quarkus.io/guides/rest-client[Quarkus REST Client] (as if it was annotated with `@RegisterRestClient`),
+so everything the REST Client supports is available: Jakarta REST annotations, `Uni<T>` and `CompletionStage<T>` return types,
+providers, exception mappers, etc. The differences are:
 
-* `@Path` on the interface and on the method defines the invoked method name (e.g. `orders/1`).
-* `@GET`, `@POST`, `@PUT`, `@DELETE`, ... define the HTTP verb; `POST` is used when none is present.
-* `@PathParam`, `@QueryParam` and `@HeaderParam` are applied to the request.
-* A single non-annotated parameter is sent as the request body.
-* The return type can be a plain type (blocking call), `void`, `Mono<T>`, `Uni<T>` or `CompletionStage<T>`.
+* the requests are sent to the Dapr sidecar (`DAPR_HTTP_ENDPOINT`, or `DAPR_SIDECAR_IP` and `DAPR_HTTP_PORT`) instead of a configured URL;
+* the `dapr-app-id` header is set to the `appId` attribute, so the sidecar routes the request to the target application;
+* the `dapr-api-token` header is sent when `DAPR_API_TOKEN` is set;
+* the client is injected with `@DaprInvokeClient` instead of `@RestClient`.
+
+The client can be tuned with the REST Client configuration, using the fully qualified name of the interface as the key,
+e.g. `quarkus.rest-client."org.acme.OrderService".read-timeout=5000`.
 
 The `appId` attribute can reference a config property, e.g. `@RegisterDaprInvokeClient(appId = "${order-service.app-id}")`.
 
