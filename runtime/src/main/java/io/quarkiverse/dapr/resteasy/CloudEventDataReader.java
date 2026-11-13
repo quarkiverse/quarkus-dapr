@@ -19,12 +19,11 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.ws.rs.ext.Provider;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.dapr.client.domain.CloudEvent;
 import io.quarkiverse.dapr.config.DaprConfig;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Reads a Dapr CloudEvent and deserializes its {@code data} into the requested JAX-RS parameter type.
@@ -68,7 +67,7 @@ public class CloudEventDataReader implements MessageBodyReader<Object> {
         }
 
         String dataContentType = Optional.ofNullable(cloudEventNode.get("datacontenttype"))
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .filter(s -> !s.isBlank())
                 .orElse(MediaType.APPLICATION_JSON);
 
@@ -82,7 +81,7 @@ public class CloudEventDataReader implements MessageBodyReader<Object> {
                 if (dataNode == null || dataNode.isNull()) {
                     return null;
                 }
-                String dataText = dataNode.asText();
+                String dataText = dataNode.asString();
                 if (Objects.equals(String.class, targetType.getRawClass())) {
                     return dataText;
                 }
@@ -96,7 +95,7 @@ public class CloudEventDataReader implements MessageBodyReader<Object> {
                     return binaryData;
                 }
                 String pubsubname = Optional.ofNullable(cloudEventNode.get("pubsubname"))
-                        .map(JsonNode::asText)
+                        .map(JsonNode::asString)
                         .orElse("");
                 String rawPayload = Optional.ofNullable(daprConfig.pubSub().get(pubsubname))
                         .map(a -> a.consumeMetadata())

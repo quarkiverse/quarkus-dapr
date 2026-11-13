@@ -20,12 +20,11 @@ import org.jboss.resteasy.reactive.server.spi.ResteasyReactiveResourceInfo;
 import org.jboss.resteasy.reactive.server.spi.ServerMessageBodyReader;
 import org.jboss.resteasy.reactive.server.spi.ServerRequestContext;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.dapr.client.domain.CloudEvent;
 import io.quarkiverse.dapr.config.DaprConfig;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * CloudEventReader
@@ -89,11 +88,11 @@ public class CloudEventReader implements ServerMessageBodyReader<CloudEvent> {
     private static CloudEvent getCloudEvent(JsonNode jsonNode, JavaType valueType)
             throws IOException {
         String dataContentType = Optional.ofNullable(jsonNode.get("datacontenttype"))
-                .map(JsonNode::asText)
+                .map(JsonNode::asString)
                 .orElse(MediaType.APPLICATION_JSON);
         if (isOctetStream(dataContentType)) {
             byte[] binaryData = jsonNode.get("data_base64").binaryValue();
-            String pubsubname = jsonNode.get("pubsubname").asText();
+            String pubsubname = jsonNode.get("pubsubname").asString();
             String rawPayload = Optional.ofNullable(DAPR_CONFIG.pubSub().get(pubsubname))
                     .map(a -> a.consumeMetadata())
                     .map(a -> a.get("rawPayload"))

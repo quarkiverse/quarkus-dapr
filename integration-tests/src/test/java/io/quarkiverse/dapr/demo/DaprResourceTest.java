@@ -14,10 +14,9 @@ import jakarta.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.dapr.client.domain.CloudEvent;
 import io.quarkus.test.junit.QuarkusTest;
+import tools.jackson.databind.ObjectMapper;
 
 @QuarkusTest
 public class DaprResourceTest {

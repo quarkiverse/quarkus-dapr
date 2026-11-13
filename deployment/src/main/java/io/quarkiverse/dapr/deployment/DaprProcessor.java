@@ -20,10 +20,6 @@ import org.jboss.jandex.MethodInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.dapr.Topic;
 import io.dapr.actors.runtime.ActorRuntimeConfig;
 import io.dapr.client.domain.CloudEvent;
@@ -56,6 +52,9 @@ import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.resteasy.reactive.spi.MessageBodyReaderBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * DaprProcessor
@@ -226,7 +225,7 @@ public class DaprProcessor {
                 .map(a -> {
                     try {
                         return OBJECT_MAPPER.readValue(a.asString(), MAP_TYPE);
-                    } catch (JsonProcessingException e) {
+                    } catch (JacksonException e) {
                         log.error("dapr topic metadata to path error in class:{},topicName:{}",
                                 classInfo.name().toString(),
                                 topicName, e);
