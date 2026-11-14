@@ -59,6 +59,23 @@
                 </resources>
               </configuration>
             </execution>
+            <execution>
+              <id>copy-attributes</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.basedir}/modules/ROOT/pages/includes/</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>${project.basedir}/templates/includes</directory>
+                    <include>attributes.adoc</include>
+                    <filtering>true</filtering>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
           </executions>
         </plugin>
         <plugin>

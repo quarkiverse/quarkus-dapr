@@ -1,14 +1,33 @@
 = Quarkus - Dapr
 :extension-status: preview
 
+include::./includes/attributes.adoc[]
+
+A Quarkus extension that lets you build applications on top of the https://dapr.io/[Dapr] distributed application runtime.
+
+== Installation
+
+If you want to use this extension, you need to add the `io.quarkiverse.dapr:quarkus-dapr` extension first to your build file.
+
+For instance, with Maven, add the following dependency to your POM file:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+    <groupId>io.quarkiverse.dapr</groupId>
+    <artifactId>quarkus-dapr</artifactId>
+    <version>{project-version}</version>
+</dependency>
+----
+
 == Introduction
 
 === What is Dapr?
 
-Dapr is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and 
-stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks. 
+Dapr is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and
+stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks.
 
-Leveraging the benefits of a sidecar architecture, Dapr helps you tackle the challenges that come with building 
+Leveraging the benefits of a sidecar architecture, Dapr helps you tackle the challenges that come with building
 microservices and keeps your code platform agnostic.
 
 For more information about Dapr, please go https://dapr.io/.
@@ -17,29 +36,16 @@ For more information about Dapr, please go https://dapr.io/.
 
 Quarkus Dapr is a Quarkus extension to integrate with Dapr.
 
-Quarkus Dapr Extension enables Java developers to create ultra lightweight Java native applications for Function 
-Computing and FaaS scenes, which is also particularly suitable for running as serverless. 
+Quarkus Dapr Extension enables Java developers to create ultra lightweight Java native applications for Function
+Computing and FaaS scenes, which is also particularly suitable for running as serverless.
 
 With the help of Dapr, these ultra lightweight Java native applications can easily interact with external application
-and resources. Dapr provides many useful building blocks to build modern distributed application: service invocation, 
+and resources. Dapr provides many useful building blocks to build modern distributed application: service invocation,
 state management, input/output bindings, publish & subscribe, secret management......
 
 Because of the advantages of sidecar model, the native applications can benefit from Dapr's distributed capabilities
 while remain lightweight without introducing too many dependencies. This is not only helping to keep the size of java
 native applications, but also making the native applications easy to build as native images.
-
-== Installation
-
-If you want to use this extension, you need to add the `io.quarkiverse.dapr:quarkus-dapr` extension first.
-In your `pom.xml` file, add:
-
-[source,xml]
-----
-<dependency>
-    <groupId>io.quarkiverse.dapr</groupId>
-    <artifactId>quarkus-dapr</artifactId>
-</dependency>
-----
 
 == Examples
 
@@ -54,17 +60,47 @@ To publish events to your message broker, just inject a dapr client to your bean
 @Inject
 SyncDaprClient dapr;
 
-dapr.publishEvent("messagebus", "topic1", content.getBytes(StandardCharsets.UTF_8), new HashMap<>());
+dapr.publishEvent("messagebus", "topic1", "Hello from Quarkus!");
 ----
 
-To subscribe events for your message broker, adding some annotations on your method is enough:
+To subscribe events for your message broker, adding some annotations on your method is enough.
+Dapr delivers each event wrapped in a https://cloudevents.io/[CloudEvent] envelope. Declare the method parameter
+as `io.dapr.client.domain.CloudEvent<T>`, where `T` is the type of the event payload, to get access to the envelope:
 
 [source,java]
 ----
 @POST
 @Path("/topic1")
 @Topic(name = "topic1", pubsubName = "messagebus")
-public String eventOnTopic2(String content) {......}
+public void eventOnTopic1(CloudEvent<String> event) {
+    String content = event.getData();
+    // ...
+}
+----
+
+This extension supports `CloudEvent` as the event type, with any payload type:
+
+[source,java]
+----
+@POST
+@Path("/topic2")
+@Topic(name = "topic2", pubsubName = "messagebus")
+public void eventOnTopic2(CloudEvent<MyData> event) {
+    MyData data = event.getData();
+    // ...
+}
+----
+
+The parameter can also be a custom type, which is deserialized from the event data:
+
+[source,java]
+----
+@POST
+@Path("/topic3")
+@Topic(name = "topic3", pubsubName = "messagebus")
+public void eventOnTopic3(MyData data) {
+    // ...
+}
 ----
 
 In the attributes `name`, `pubsubName`, and `match` of the `@Topic` annotation, it is possible to set a config property to be loaded at runtime.
@@ -74,19 +110,17 @@ In the attributes `name`, `pubsubName`, and `match` of the `@Topic` annotation, 
 @POST
 @Path("/topic6")
 @Topic(name = "${topic6}", pubsubName = "${pubsub.topic6}", rule = @Rule(match = "${match.rule6}", priority = 1))
-public String eventOnTopic6(String content) {......}
+public void eventOnTopic6(CloudEvent<String> event) {
+    // ...
+}
 ----
 
-
 For more details and hands-on experiences, please reference to our link:https://github.com/quarkiverse/quarkus-dapr/blob/main/demo/README.md[Demo].
+
+[[devservices]]
+include::includes/devservices.adoc[leveloffset=+1, opts=optional]
 
 [[extension-configuration-reference]]
 == Extension Configuration Reference
 
-[[devservices]]
-== Dapr DevServices
-include::includes/devservices.adoc[leveloffset=+1, opts=optional]
-
 include::includes/quarkus-dapr.adoc[leveloffset=+1, opts=optional]
-
-
