@@ -26,6 +26,10 @@
             <artifactId>quarkus-rest-jackson-deployment</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-jackson-deployment</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.quarkiverse.dapr</groupId>
             <artifactId>quarkus-dapr</artifactId>
             <version>${project.version}</version>
