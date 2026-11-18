@@ -13,12 +13,12 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkiverse.dapr.devui.DaprComponent;
 import io.quarkiverse.dapr.devui.DaprDashboardRPCService;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class DaprComponentDiscoveryTest {
 
     @RegisterExtension
-    static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+    static final QuarkusExtensionTest unitTest = new QuarkusExtensionTest()
             .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
                     .addClass(DaprDashboardRPCService.class)
                     .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")

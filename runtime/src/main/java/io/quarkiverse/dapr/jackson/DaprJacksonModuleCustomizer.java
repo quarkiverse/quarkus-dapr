@@ -10,23 +10,22 @@ import jakarta.inject.Singleton;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 
-import io.quarkus.jackson.ObjectMapperCustomizer;
+import io.quarkus.jackson.JsonMapperBuilderCustomizer;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
+import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
+import tools.jackson.databind.ext.javatime.deser.LocalTimeDeserializer;
+import tools.jackson.databind.ext.javatime.ser.LocalDateSerializer;
+import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
+import tools.jackson.databind.ext.javatime.ser.LocalTimeSerializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 @Singleton
-public class DaprJacksonModuleCustomizer implements ObjectMapperCustomizer {
+public class DaprJacksonModuleCustomizer implements JsonMapperBuilderCustomizer {
 
     public static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final String DATE_PATTERN = "yyyy-MM-dd";
@@ -36,30 +35,31 @@ public class DaprJacksonModuleCustomizer implements ObjectMapperCustomizer {
     public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
     @Override
-    public void customize(ObjectMapper objectMapper) {
+    public void customize(JsonMapper.Builder builder) {
         // 配置[忽略未知字段]
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         // 空对象可序列化
-        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        builder.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
         // null属性不序列化
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        builder.changeDefaultPropertyInclusion(inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_NULL));
 
         // allow non-public record constructors (e.g., nested records)
-        objectMapper.setVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY);
+        builder.changeDefaultVisibility(
+                visibility -> visibility.withVisibility(PropertyAccessor.CREATOR, JsonAutoDetect.Visibility.ANY));
 
         // 能解析注释符
-        objectMapper.enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.mappedFeature());
+        builder.enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER);
 
         // 能解析注释
-        objectMapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
+        builder.enable(JsonReadFeature.ALLOW_JAVA_COMMENTS);
 
         // 解析单引号
-        objectMapper.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
+        builder.enable(JsonReadFeature.ALLOW_SINGLE_QUOTES);
 
         // 配置[时间类型转换]
-        JavaTimeModule timeModule = new JavaTimeModule();
+        SimpleModule timeModule = new SimpleModule();
         // LocalDateTime序列化与反序列化
         timeModule.addSerializer(new LocalDateTimeSerializer(DATE_TIME_FORMATTER));
         timeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DATE_TIME_FORMATTER));
@@ -69,6 +69,6 @@ public class DaprJacksonModuleCustomizer implements ObjectMapperCustomizer {
         // LocalTime序列化与反序列化
         timeModule.addSerializer(new LocalTimeSerializer(TIME_FORMATTER));
         timeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(TIME_FORMATTER));
-        objectMapper.registerModule(timeModule);
+        builder.addModule(timeModule);
     }
 }

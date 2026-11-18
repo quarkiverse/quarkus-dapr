@@ -16,9 +16,13 @@ package io.quarkiverse.dapr.core;
 import java.util.Collections;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 /**
  * Class to represent a subscription topic along with its metadata.
  */
+// keep the declaration order, Jackson 3 sorts the properties alphabetically by default
+@JsonPropertyOrder({ "pubsubName", "topic", "route", "routes", "metadata" })
 public class DaprTopicSubscription {
     private final String pubsubName;
     private final String topic;

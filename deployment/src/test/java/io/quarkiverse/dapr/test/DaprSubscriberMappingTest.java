@@ -26,7 +26,7 @@ import io.quarkiverse.dapr.deployment.items.DaprTopicBuildItem;
 import io.quarkus.builder.BuildChainBuilder;
 import io.quarkus.builder.BuildContext;
 import io.quarkus.builder.BuildStep;
-import io.quarkus.test.QuarkusUnitTest;
+import io.quarkus.test.QuarkusExtensionTest;
 
 public class DaprSubscriberMappingTest {
 
@@ -34,7 +34,7 @@ public class DaprSubscriberMappingTest {
 
     // Start unit test with your extension loaded
     @RegisterExtension
-    static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+    static final QuarkusExtensionTest unitTest = new QuarkusExtensionTest()
             .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class))
             .addBuildChainCustomizer(buildCustomizer());
 
