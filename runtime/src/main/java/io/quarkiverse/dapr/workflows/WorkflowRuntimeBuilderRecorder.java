@@ -9,6 +9,7 @@ import jakarta.enterprise.inject.Any;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.dapr.config.Properties;
 import io.dapr.durabletask.TaskActivity;
 import io.dapr.durabletask.TaskActivityFactory;
 import io.dapr.durabletask.TaskOrchestration;
@@ -45,7 +46,7 @@ public class WorkflowRuntimeBuilderRecorder {
             Map<String, Boolean> workflowIsLatest,
             Map<String, String> activityNames) {
 
-        WorkflowRuntimeBuilder builder = new WorkflowRuntimeBuilder();
+        WorkflowRuntimeBuilder builder = new WorkflowRuntimeBuilder(Arc.container().instance(Properties.class).get());
 
         for (String workflow : workflows) {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
