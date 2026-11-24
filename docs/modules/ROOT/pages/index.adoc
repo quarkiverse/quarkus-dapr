@@ -117,6 +117,24 @@ public void eventOnTopic6(CloudEvent<String> event) {
 
 For more details and hands-on experiences, please reference to our link:https://github.com/quarkiverse/quarkus-dapr/blob/main/demo/README.md[Demo].
 
+[[sidecar-connection]]
+== Connecting to the Dapr sidecar
+
+The `DaprClient`, `SyncDaprClient`, `DaprWorkflowClient`, the workflow runtime and the actor runtime all connect to the Dapr sidecar using the `quarkus.dapr.*` runtime properties, so they can be set in `application.properties`, per profile, or from any other Quarkus config source:
+
+[source,properties]
+----
+quarkus.dapr.sidecar-ip=127.0.0.1
+quarkus.dapr.http-port=3501
+quarkus.dapr.grpc-port=50002
+%prod.quarkus.dapr.api-token=${DAPR_TOKEN_FROM_SECRET}
+----
+
+Properties that are not set fall back to the Dapr SDK defaults, so the `DAPR_*` environment variables (e.g. `DAPR_HTTP_PORT`, `DAPR_API_TOKEN`) and `dapr.*` system properties keep working.
+Note that the plain SDK names (e.g. `dapr.http.port`) are not read from `application.properties`; use the `quarkus.dapr.*` names instead.
+
+The configured values are also available as an `io.dapr.config.Properties` bean, which can be used to create additional Dapr SDK clients (e.g. `new ActorClient(properties)`).
+
 [[devservices]]
 include::includes/devservices.adoc[leveloffset=+1, opts=optional]
 

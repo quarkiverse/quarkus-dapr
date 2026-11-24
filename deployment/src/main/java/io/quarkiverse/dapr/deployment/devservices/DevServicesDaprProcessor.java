@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 import org.yaml.snakeyaml.Yaml;
 
-import io.dapr.config.Properties;
 import io.dapr.testcontainers.Component;
 import io.dapr.testcontainers.MetadataEntry;
 import io.quarkiverse.dapr.deployment.items.DaprComponentBuildItem;
@@ -57,6 +56,9 @@ public class DevServicesDaprProcessor {
     private static final String DASHBOARD_WORKFLOW = QUARKUS_DAPR_SERVICE_NAME_PREFIX + "dashboard-workflow";
     private static final String STATESTORE_PG = QUARKUS_DAPR_SERVICE_NAME_PREFIX + "statestore-pgsql";
     private static final String POSTGRESQL_PORT_PROPERTY = "quarkus.dapr.devservices.dashboard.pgsql.port";
+    private static final String SIDECAR_IP_PROPERTY = "quarkus.dapr.sidecar-ip";
+    private static final String HTTP_PORT_PROPERTY = "quarkus.dapr.http-port";
+    private static final String GRPC_PORT_PROPERTY = "quarkus.dapr.grpc-port";
     private static final String COMPONENTS_DIR = "components";
     private static final String PGSQL_STATE_STORE_TYPE = "state.postgresql";
 
@@ -228,11 +230,12 @@ public class DevServicesDaprProcessor {
         }
 
         return builder
-                .postStartHook(startable -> {
-                    DaprContainerStartable daprContainerStartable = (DaprContainerStartable) startable;
-                    System.setProperty(Properties.GRPC_PORT.getName(), Integer.toString(daprContainerStartable.getGrpcPort()));
-                    System.setProperty(Properties.HTTP_PORT.getName(), Integer.toString(daprContainerStartable.getHttpPort()));
-                })
+                .configProvider(Map.of(
+                        SIDECAR_IP_PROPERTY, startable -> ((DaprContainerStartable) startable).getHost(),
+                        HTTP_PORT_PROPERTY,
+                        startable -> Integer.toString(((DaprContainerStartable) startable).getHttpPort()),
+                        GRPC_PORT_PROPERTY,
+                        startable -> Integer.toString(((DaprContainerStartable) startable).getGrpcPort())))
                 .build();
     }
 
