@@ -1,0 +1,9 @@
+name: Reactive Messaging Dapr
+description: Microprofile Reactive Messaging implementation for Dapr Pub/Sub
+metadata:
+  keywords:
+    - reactive-messaging-dapr
+  guide: https://docs.quarkiverse.io/quarkus-dapr/dev/
+  categories:
+    - "miscellaneous"
+  status: "preview"
